@@ -2,15 +2,24 @@
   "name": "gloomhaven-card-creator2",
   "version": "0.1.0",
   "private": true,
+  "homdpage": "https://north101.github.io",
   "dependencies": {
+    "@bitjourney/uuid-v4": "^1.0.1",
+    "@types/file-saver": "^2.0.1",
     "@types/jest": "24.0.13",
-    "@types/node": "12.0.2",
-    "@types/react": "16.8.18",
+    "@types/node": "12.0.7",
+    "@types/react": "16.8.19",
     "@types/react-dom": "16.8.4",
+    "@types/slate-react": "^0.22.0",
+    "file-saver": "^2.0.2",
+    "html-to-image": "^0.1.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
     "react-scripts": "3.0.1",
-    "typescript": "3.4.5"
+    "slate": "^0.47.4",
+    "slate-react": "^0.22.4",
+    "throttle-debounce": "^2.1.0",
+    "typescript": "3.5.1"
   },
   "scripts": {
     "start": "react-scripts start",
