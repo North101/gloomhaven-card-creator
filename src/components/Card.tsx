@@ -162,6 +162,19 @@ export class Card extends React.Component<CardProps, CardState> {
     });
   }
 
+  deleteAction = (key: string) => {
+    const actions = {
+      ...this.state.actions,
+    };
+    delete actions[key];
+
+    this.setState({
+      actions: {
+        ...actions
+      },
+    });
+  }
+
   onDragAction = (key: string, x: number, y: number) => {
     this.setState({
       mouse: {
@@ -281,7 +294,17 @@ export class Card extends React.Component<CardProps, CardState> {
           {this.state.summonBottom ? <Summon className='summon-bottom center runes'/> : ''}
 
           {Object.entries(this.state.actions).map(([key, value]) => {
-            return <ActionEditor cursor={this.props.cursor} onDragAction={this.onDragAction} key={key} id={key} {...value}/>
+            return <ActionEditor
+              key={key}
+              cursor={this.props.cursor}
+              deleteAction={() => {
+                this.deleteAction(key);
+              }}
+              onDragAction={(x: number, y: number) => {
+                this.onDragAction(key, x, y);
+              }}
+              {...value}
+            />
           })}
         </div>
         <img
