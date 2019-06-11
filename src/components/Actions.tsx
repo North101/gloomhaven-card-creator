@@ -1,5 +1,7 @@
 import React from 'react';
 
+import { Image } from './Image'
+
 export interface ActionProps {
   className?: string;
   text: string;
@@ -17,7 +19,7 @@ export const Action: React.FC<ActionProps> = (props) => {
     <div className={props.className || 'action'}>
       <span>{props.data && props.data.iconOnly ? '' : props.text}</span>
       {props.children && <span>{props.children}</span>}
-      <img alt={props.text} src={props.icon || require(`../assets/${props.action}.png`)}/>
+      <Image alt={props.text} src={props.icon || require(`../assets/${props.action}.png`)}/>
     </div>
   )
 }
@@ -153,7 +155,7 @@ export const BlessAction: React.FC<Partial<ActionProps>> = (props) => StatusActi
 export const XPAction: React.FC<ActionProps> = (props) => {
   return (
     <div className={`action xp ${props.data && props.data.size}`}>
-      <img alt='xp' src={require('../assets/xp.png')}/>
+      <Image alt='xp' src={require('../assets/xp.png')}/>
       <span>{props.children}</span>
     </div>
   )

@@ -5,6 +5,7 @@ import { Value } from 'slate';
 import Plain from 'slate-plain-serializer'
 
 import { renderActions } from './Actions'
+import { Image } from './Image'
 
 
 export interface SummonProps {
@@ -180,7 +181,7 @@ export class Summon extends React.Component<SummonProps, SummonState> {
   render() {
     return (
       <div className={this.props.className}>
-        <img alt='summon' src={require('../assets/summon.png')}/>
+        <Image alt='summon' src={require('../assets/summon.png')}/>
         <Editor
           className='summon name single-line'
           value={this.state.name}

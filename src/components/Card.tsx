@@ -8,15 +8,30 @@ import { generateUUIDv4 } from '@bitjourney/uuid-v4';
 
 import { ActionEditor, ActionContent } from './ActionEditor'
 import { Summon } from './Summon'
+import { Image } from './Image'
+
+
+interface CardData {
+  actions: {
+    [key: string]: ActionContent,
+  };
+  title: Value;
+  level: Value;
+  initiative: Value;
+  summonTop: boolean;
+  summonBottom: boolean;
+}
 
 
 export interface CardProps {
   color: string;
+  data?: CardData;
   cursor: 'move' | 'text' | null;
+  onDataChange: (data: CardData) => void;
   onCursorChange: (cursor: 'move' | 'text' | null) => void;
 };
 
-export interface CardState {
+export interface CardState extends CardData {
   actions: {
     [key: string]: ActionContent,
   };
@@ -69,6 +84,7 @@ export class Card extends React.Component<CardProps, CardState> {
       initiative: Plain.deserialize('00'),
       summonTop: false,
       summonBottom: false,
+      ...(props.data || {}),
     }
   }
 
@@ -229,6 +245,17 @@ export class Card extends React.Component<CardProps, CardState> {
   }
 
   componentDidUpdate(prevProps, prevState) {
+    if (prevState !== this.state) {
+      this.props.onDataChange({
+        actions: this.state.actions,
+        title: this.state.title,
+        level: this.state.level,
+        initiative: this.state.initiative,
+        summonTop: this.state.summonTop,
+        summonBottom: this.state.summonBottom,
+      });
+    }
+
     if (prevProps.color === this.props.color) return;
 
     const editor = this.editor as any;
@@ -264,60 +291,62 @@ export class Card extends React.Component<CardProps, CardState> {
 
   render() {
     return (
-      <div id='card' className='card'>
-        <img alt='card' className='center' src={require('../assets/card.jpg')}/>
-        <img alt='card-runes' className='center runes' src={require('../assets/card-runes.jpg')}/>
-        <div className='center color' style={{background: `${this.props.color}80`}}></div>
-        <div className='actions' onDrop={this.onDrop} onDragOver={this.onDragOver} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp}>
-          <Editor
-            className='title single-line'
-            readOnly={this.props.cursor !== 'text'}
-            value={this.state.title}
-            onChange={this.onTitleChange}
-            renderMark={this.renderTitleMark}
-            ref={this.ref}
-          />
-          <Editor
-            className='level single-line'
-            readOnly={this.props.cursor !== 'text'}
-            value={this.state.level}
-            onChange={this.onLevelChange}
-          />
-          <Editor
-            className='initiative single-line'
-            readOnly={this.props.cursor !== 'text'}
-            value={this.state.initiative}
-            onChange={this.onInitiativeChange}
-          />
-
-          {this.state.summonTop ? <Summon className='summon-top center runes'/> : ''}
-          {this.state.summonBottom ? <Summon className='summon-bottom center runes'/> : ''}
-
-          {Object.entries(this.state.actions).map(([key, value]) => {
-            return <ActionEditor
-              key={key}
-              cursor={this.props.cursor}
-              deleteAction={() => {
-                this.deleteAction(key);
-              }}
-              onDragAction={(x: number, y: number) => {
-                this.onDragAction(key, x, y);
-              }}
-              {...value}
+      <div className='card'>
+        <div>
+          <Image alt='card' className='center' src={require('../assets/card.jpg')}/>
+          <Image alt='card-runes' className='center runes' src={require('../assets/card-runes.jpg')}/>
+          <div className='center color' style={{background: `${this.props.color}80`}}></div>
+          <div className='actions' onDrop={this.onDrop} onDragOver={this.onDragOver} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp}>
+            <Editor
+              className='title single-line'
+              readOnly={this.props.cursor !== 'text'}
+              value={this.state.title}
+              onChange={this.onTitleChange}
+              renderMark={this.renderTitleMark}
+              ref={this.ref}
             />
-          })}
+            <Editor
+              className='level single-line'
+              readOnly={this.props.cursor !== 'text'}
+              value={this.state.level}
+              onChange={this.onLevelChange}
+            />
+            <Editor
+              className='initiative single-line'
+              readOnly={this.props.cursor !== 'text'}
+              value={this.state.initiative}
+              onChange={this.onInitiativeChange}
+            />
+
+            {this.state.summonTop ? <Summon className='summon-top center runes'/> : ''}
+            {this.state.summonBottom ? <Summon className='summon-bottom center runes'/> : ''}
+
+            {Object.entries(this.state.actions).map(([key, value]) => {
+              return <ActionEditor
+                key={key}
+                cursor={this.props.cursor}
+                deleteAction={() => {
+                  this.deleteAction(key);
+                }}
+                onDragAction={(x: number, y: number) => {
+                  this.onDragAction(key, x, y);
+                }}
+                {...value}
+              />
+            })}
+          </div>
         </div>
-        <img
+        <Image
           src={require('../assets/summon1.png')}
-          className="summon-top-toggle"
+          className="summon-toggle top"
           style={{
             filter: this.state.summonTop ? undefined : 'grayscale()',
           }}
           onClick={this.onToggleSummonTop}
         />
-        <img
+        <Image
           src={require('../assets/summon2.png')}
-          className="summon-bottom-toggle"
+          className="summon-toggle bottom"
           style={{
             filter: this.state.summonBottom ? undefined : 'grayscale()',
           }}

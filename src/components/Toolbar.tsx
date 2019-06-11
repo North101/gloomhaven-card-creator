@@ -1,15 +1,15 @@
 import React from 'react';
 
 import { throttle } from 'throttle-debounce';
-import { saveAs } from 'file-saver';
 
-const htmlToImage = require('html-to-image');
+import { Image } from './Image'
 
 
 export interface ToolbarProps {
   color: string;
   onColorChange: (color: string) => void;
   onCursorChange: (cursor: 'move' | 'text' | null) => void;
+  onPrintClick: () => void;
 }
 
 export interface ToolbarState {
@@ -49,19 +49,11 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
     e.dataTransfer.dropEffect = 'copy';
   }
 
-  onSaveClick = (e: any) => {
+  onPrintClick = (e: any) => {
     e.preventDefault();
     e.stopPropagation();
 
-    const element = document.getElementById('card');
-    if (!element) return;
-
-    htmlToImage.toBlob(element)
-      .then((blob) => {
-        if (blob) {
-          saveAs(blob, 'my-card.png');
-        }
-      });
+    this.props.onPrintClick();
   }
 
   onMoveClick = (e: any) => {
@@ -77,9 +69,9 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
       <div className='toolbar'>
         <div><input type='color' value={this.state.color} onChange={this.onColorChange}/></div>
         
-        <div style={{cursor: 'pointer'}} className='material-icons' onClick={this.onSaveClick}>save</div>
-        <div style={{cursor: 'pointer'}} className='material-icons' onClick={this.onMoveClick}>zoom_out_map</div>
-        <div draggable className='material-icons' onDragStart={this.onDragStart} onClick={this.onTextClick}>title</div>
+        <div style={{cursor: 'pointer'}} className='material-icons md-light' onClick={this.onPrintClick}>print</div>
+        <div style={{cursor: 'pointer'}} className='material-icons md-light' onClick={this.onMoveClick}>zoom_out_map</div>
+        <div draggable className='material-icons md-light' onDragStart={this.onDragStart} onClick={this.onTextClick}>title</div>
         
         <ToolbarIcon action='attack' />
         <ToolbarIcon action='heal' />
@@ -146,7 +138,7 @@ export const ToolbarIcon: React.FC<ToolbarIconProps> = (props) => {
 
   return (
     <div draggable>
-      <img alt={props.icon} src={props.icon || require(`../assets/${props.action}.png`)} onDragStart={onDragStart}/>
+      <Image alt={props.icon} src={props.icon || require(`../assets/${props.action}.png`)} onDragStart={onDragStart}/>
     </div>
   );
 }

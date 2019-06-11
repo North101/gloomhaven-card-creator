@@ -13,9 +13,19 @@
   src: url(assets/HTOWERT.TTF);
 }
 
+.material-icons.md-light {
+  color: white;
+}
+
 body, #root {
   margin: 0;
   height: 100vh;
+}
+
+#card-container {
+  display: flex;
+  flex: 1;
+  align-self: center;
 }
 
 .card {
@@ -44,20 +54,19 @@ body, #root {
   mix-blend-mode: color;
 }
 
-.card .summon-top-toggle {
+#card-container .summon-toggle {
   position: absolute;
-  top: 97px;
   left: -78px;
   height: 68px;
   width: auto;
 }
 
-.card .summon-bottom-toggle {
-  position: absolute;
+#card-container .summon-toggle.top {
+  top: 97px;
+}
+
+#card-container .summon-toggle.bottom {
   top: 337px;
-  left: -78px;
-  height: 68px;
-  width: auto;
 }
 
 .actions {
@@ -292,4 +301,10 @@ body, #root {
 .inline-action {
   pointer-events: none;
   display: inline-flex;
+}
+
+@media print {
+  .toolbar, .summon-toggle {
+      display:none;
+  }
 }
