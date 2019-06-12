@@ -193,12 +193,6 @@ body, #root {
 
 .action-main {
   font-family: Nyala;
-  font-size: 18pt;
-}
-
-.action-modifier {
-  font-family: Nyala;
-  font-size: 14pt;
 }
 
 .action > div {

@@ -1,29 +1,28 @@
-import React from 'react';
+import React from 'react'
 
-import { Editor } from 'slate-react';
-import { Value } from 'slate';
+import { Editor } from 'slate-react'
+import { Value } from 'slate'
 import Plain from 'slate-plain-serializer'
 
 import { renderActions } from './Actions'
-import { Image } from './Image'
 
 
 export interface SummonProps {
-  className: string;
+  className: string
 }
 
 export interface SummonState {
-  name: Value;
-  box1: Value;
-  box2: Value;
-  box3: Value;
-  box4: Value;
-  box5: Value;
+  name: Value
+  box1: Value
+  box2: Value
+  box3: Value
+  box4: Value
+  box5: Value
 }
 
 export class Summon extends React.Component<SummonProps, SummonState> {
   constructor(props: SummonProps) {
-    super(props);
+    super(props)
 
     this.state = {
       name: Plain.deserialize('Summon '),
@@ -139,49 +138,49 @@ export class Summon extends React.Component<SummonProps, SummonState> {
           ]
         }
       } as any),
-    };
+    }
   }
 
   onNameChange = ({value}) => {
     this.setState({
       name: value,
-    });
+    })
   }
 
   onBox1Change = ({value}) => {
     this.setState({
       box1: value,
-    });
+    })
   }
 
   onBox2Change = ({value}) => {
     this.setState({
       box2: value,
-    });
+    })
   }
 
   onBox3Change = ({value}) => {
     this.setState({
       box3: value,
-    });
+    })
   }
 
   onBox4Change = ({value}) => {
     this.setState({
       box4: value,
-    });
+    })
   }
 
   onBox5Change = ({value}) => {
     this.setState({
       box5: value,
-    });
+    })
   }
 
   render() {
     return (
       <div className={this.props.className}>
-        <Image alt='summon' src={require('../assets/summon.png')}/>
+        <img alt='summon' src={require('../assets/summon.png')}/>
         <Editor
           className='summon name single-line'
           value={this.state.name}

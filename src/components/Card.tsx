@@ -1,84 +1,76 @@
-import React from 'react';
+import React from 'react'
 
-import { Editor } from 'slate-react';
-import { Value } from 'slate';
+import { Editor } from 'slate-react'
+import { Value } from 'slate'
 import Plain from 'slate-plain-serializer'
 
-import { generateUUIDv4 } from '@bitjourney/uuid-v4';
+import { generateUUIDv4 } from '@bitjourney/uuid-v4'
 
 import { ActionEditor, ActionContent } from './ActionEditor'
 import { Summon } from './Summon'
-import { Image } from './Image'
+import { HexGrid, HexState } from './HexGrid'
 
 
 interface CardData {
   actions: {
     [key: string]: ActionContent,
-  };
-  title: Value;
-  level: Value;
-  initiative: Value;
-  summonTop: boolean;
-  summonBottom: boolean;
+  }
+  hexes: {
+    [key: string]: HexState,
+  }
+  title: Value
+  level: Value
+  initiative: Value
+  summonTop: boolean
+  summonBottom: boolean
 }
 
 
 export interface CardProps {
-  color: string;
-  data?: CardData;
-  cursor: 'move' | 'text' | null;
-  onDataChange: (data: CardData) => void;
-  onCursorChange: (cursor: 'move' | 'text' | null) => void;
-};
+  color: string
+  data?: CardData
+  cursor: 'move' | 'text' | null
+  onDataChange: (data: CardData) => void
+  onCursorChange: (cursor: 'move' | 'text' | null) => void
+}
 
 export interface CardState extends CardData {
-  actions: {
-    [key: string]: ActionContent,
-  };
-  title: Value;
-  level: Value;
-  initiative: Value;
-  summonTop: boolean;
-  summonBottom: boolean;
-
   mouse?: {
-    key: string;
-    x: number;
-    y: number;
+    type: 'action' | 'hex'
+    key: string
+    x: number
+    y: number
   }
-};
+}
 
 export class Card extends React.Component<CardProps, CardState> {
-  editor?: Editor;
+  editor?: Editor
 
   constructor(props: CardProps) {
-    super(props);
+    super(props)
 
     this.state = {
       actions: {},
+      hexes: {},
       title: Value.fromJSON({
         object: 'value',
         document: {
           object: 'document',
-          nodes: [
-            {
-              object: 'block',
-              type: 'action-main',
-              nodes: [
-                {
-                  object: 'text',
-                  text: 'Card Name',
-                  marks: [{
-                    type: 'card-title',
-                    data: {
-                      color: props.color
-                    }
-                  }]
-                }
-              ]
-            }
-          ]
-        }
+          nodes: [{
+            object: 'block',
+            type: 'action-main',
+            nodes: [{
+              object: 'text',
+              text: 'Card Name',
+              marks: [{
+                type: 'card-title',
+                data: {
+                  color: props.color
+                },
+              }],
+            }],
+          }],
+        },
       } as any),
       level: Plain.deserialize('1'),
       initiative: Plain.deserialize('00'),
@@ -89,188 +81,242 @@ export class Card extends React.Component<CardProps, CardState> {
   }
 
   onDragOver = (e: any) => {
-    e.stopPropagation();
-    e.preventDefault();
+    e.stopPropagation()
+    e.preventDefault()
   }
 
   onDrop = (e: any) => {
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
-    const action = e.dataTransfer.getData('action');
-    if (typeof(action) !== 'string') return false;
+    const action = e.dataTransfer.getData('action')
+    if (typeof(action) !== 'string') return false
 
-    const data = JSON.parse(e.dataTransfer.getData('data')) || {};
-    const rect = e.target.getBoundingClientRect();
-    const x = e.clientX - rect.left;
-    const y = e.clientY - rect.top;
+    const data = JSON.parse(e.dataTransfer.getData('data')) || {}
+    const rect = e.target.getBoundingClientRect()
+    const x = e.clientX - rect.left
+    const y = e.clientY - rect.top
     
-    let value: Value;
-    if (action === 'text') {
-      value = Value.fromJSON({
-        object: 'value',
-        document: {
-          object: 'document',
-          nodes: [
-            {
-              object: 'block',
-              type: 'action-main',
-              nodes: [
-                {
-                  object: 'text',
-                  text: ' '
-                }
-              ],
-            }
-          ]
-        }
-      } as any);
+    if (action === 'hex-enemy') {
+      this.setState({
+        hexes: {
+          ...this.state.hexes,
+          [generateUUIDv4()]: {
+            hexes: [
+              {
+                row: 0,
+                column: 0,
+                type: 'enemy',
+              },
+            ],
+            width: 30,
+            height: 35,
+            x: x,
+            y: y,
+          },
+        },
+      })
     } else {
-      value = Value.fromJSON({
-        object: 'value',
-        document: {
-          object: 'document',
-          nodes: [
-            {
+      let value: Value
+      if (action === 'text') {
+        value = Value.fromJSON({
+          object: 'value',
+          document: {
+            object: 'document',
+            nodes: [{
               object: 'block',
               type: 'action-main',
-              nodes: [
-                {
-                  ...data,
-                  object: 'inline',
-                  type: action,
-                }
-              ]
-            }
-          ]
-        }
-      } as any);
+              nodes: [{
+                object: 'text',
+                text: ' '
+              }],
+            }],
+          },
+        } as any)
+      } else {
+        value = Value.fromJSON({
+          object: 'value',
+          document: {
+            object: 'document',
+            nodes: [{
+              object: 'block',
+              type: 'action-main',
+              nodes: [{
+                ...data,
+                object: 'inline',
+                type: action,
+              }],
+            }],
+        },
+        } as any)
+      }
+
+      this.setState({
+        actions: {
+          ...this.state.actions,
+          [generateUUIDv4()]: {
+            value: value,
+            x: x,
+            y: y
+          },
+        },
+      })
     }
 
-    this.setState({
-      actions: {
-        ...this.state.actions,
-        [generateUUIDv4()]: {
-          value: value,
-          x: x,
-          y: y
-        }
-      }
-    });
-    this.props.onCursorChange('text');
+    this.props.onCursorChange('text')
   }
 
   onTitleChange = ({value}) => {
     this.setState({
       title: value,
-    });
+    })
   }
 
   onLevelChange = ({value}) => {
     this.setState({
       level: value,
-    });
+    })
   }
 
   onInitiativeChange = ({value}) => {
     this.setState({
       initiative: value,
-    });
+    })
   }
 
   deleteAction = (key: string) => {
     const actions = {
       ...this.state.actions,
-    };
-    delete actions[key];
+    }
+    delete actions[key]
 
     this.setState({
       actions: {
         ...actions
       },
-    });
+    })
   }
 
   onDragAction = (key: string, x: number, y: number) => {
     this.setState({
       mouse: {
+        type: 'action',
         key: key,
         x: x,
         y: y,
       }
-    });
+    })
+  }
+
+  deleteHex = (key: string) => {
+    const hexes = {
+      ...this.state.hexes,
+    }
+    delete hexes[key]
+
+    this.setState({
+      hexes: {
+        ...hexes
+      },
+    })
+  }
+
+  onDragHex = (key: string, x: number, y: number) => {
+    this.setState({
+      mouse: {
+        type: 'hex',
+        key: key,
+        x: x,
+        y: y,
+      }
+    })
   }
 
   onMouseMove = (e: any) => {
-    if (this.props.cursor !== 'move' || !this.state.mouse) return;
+    if (this.props.cursor !== 'move' || !this.state.mouse) return
 
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
-    const mouse = this.state.mouse;
-    const actions = this.state.actions;
-    this.setState({
-      actions: {
-        ...actions,
-        [mouse.key]: {
-          ...actions[mouse.key],
-          x: e.clientX - mouse.x,
-          y: e.clientY - mouse.y,
-        }
-      },
-    });
+    const mouse = this.state.mouse
+    if (mouse.type === 'action') {
+      const { actions } = this.state
+      this.setState({
+        actions: {
+          ...actions,
+          [mouse.key]: {
+            ...actions[mouse.key],
+            x: e.clientX - mouse.x,
+            y: e.clientY - mouse.y,
+          }
+        },
+      })
+    } else if (mouse.type === 'hex') {
+      const { hexes } = this.state
+      this.setState({
+        hexes: {
+          ...hexes,
+          [mouse.key]: {
+            ...hexes[mouse.key],
+            x: e.clientX - mouse.x,
+            y: e.clientY - mouse.y,
+          }
+        },
+      })
+    }
   }
 
   onMouseUp = (e: any) => {
-    if (this.props.cursor !== 'move' || !this.state.mouse) return;
+    if (this.props.cursor !== 'move' || !this.state.mouse) return
 
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
     this.setState({
       mouse: undefined,
-    });
+    })
   }
 
   onToggleSummonTop = (e: any) => {
     this.setState({
       summonTop: !this.state.summonTop,
-    });
+    })
   }
 
   onToggleSummonBottom = (e: any) => {
     this.setState({
       summonBottom: !this.state.summonBottom,
-    });
+    })
   }
 
   componentDidUpdate(prevProps, prevState) {
     if (prevState !== this.state) {
       this.props.onDataChange({
         actions: this.state.actions,
+        hexes: this.state.hexes,
         title: this.state.title,
         level: this.state.level,
         initiative: this.state.initiative,
         summonTop: this.state.summonTop,
         summonBottom: this.state.summonBottom,
-      });
+      })
     }
 
-    if (prevProps.color === this.props.color) return;
+    if (prevProps.color === this.props.color) return
 
-    const editor = this.editor as any;
+    const editor = this.editor as any
     editor.value.document.getTexts().forEach((text) => {
       text.marks.forEach((mark) => {
-        if (mark.type !== 'card-title') return;
+        if (mark.type !== 'card-title') return
 
         editor.setMarkByKey(text.key, 0, undefined, mark, {
           type: 'card-title',
           data: {
             color: this.props.color,
           },
-        });
-      });
-    });
+        })
+      })
+    })
   }
 
   renderTitleMark = (props, editor, next) => {
@@ -279,10 +325,10 @@ export class Card extends React.Component<CardProps, CardState> {
         backgroundImage: `linear-gradient(${props.mark.data.get('color')}80, white)`,
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
-      };
+      }
       return <span {...props.attributes} style={style}>{props.children}</span>
     }
-    return next();
+    return next()
   }
 
   ref = (editor: any) => {
@@ -293,8 +339,8 @@ export class Card extends React.Component<CardProps, CardState> {
     return (
       <div className='card'>
         <div>
-          <Image alt='card' className='center' src={require('../assets/card.jpg')}/>
-          <Image alt='card-runes' className='center runes' src={require('../assets/card-runes.jpg')}/>
+          <img alt='card' className='center' src={require('../assets/card.jpg')}/>
+          <img alt='card-runes' className='center runes' src={require('../assets/card-runes.jpg')}/>
           <div className='center color' style={{background: `${this.props.color}80`}}></div>
           <div className='actions' onDrop={this.onDrop} onDragOver={this.onDragOver} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp}>
             <Editor
@@ -326,17 +372,30 @@ export class Card extends React.Component<CardProps, CardState> {
                 key={key}
                 cursor={this.props.cursor}
                 deleteAction={() => {
-                  this.deleteAction(key);
+                  this.deleteAction(key)
                 }}
                 onDragAction={(x: number, y: number) => {
-                  this.onDragAction(key, x, y);
+                  this.onDragAction(key, x, y)
+                }}
+                {...value}
+              />
+            })}
+            {Object.entries(this.state.hexes).map(([key, value]) => {
+              return <HexGrid
+                key={key}
+                cursor={this.props.cursor}
+                deleteHex={() => {
+                  this.deleteHex(key)
+                }}
+                onDragHex={(x: number, y: number) => {
+                  this.onDragHex(key, x, y)
                 }}
                 {...value}
               />
             })}
           </div>
         </div>
-        <Image
+        <img
           src={require('../assets/summon1.png')}
           className="summon-toggle top"
           style={{
@@ -344,7 +403,7 @@ export class Card extends React.Component<CardProps, CardState> {
           }}
           onClick={this.onToggleSummonTop}
         />
-        <Image
+        <img
           src={require('../assets/summon2.png')}
           className="summon-toggle bottom"
           style={{
@@ -353,6 +412,6 @@ export class Card extends React.Component<CardProps, CardState> {
           onClick={this.onToggleSummonBottom}
         />
       </div>
-    );
+    )
   }
 }

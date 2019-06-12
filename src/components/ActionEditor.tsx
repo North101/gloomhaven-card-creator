@@ -1,37 +1,37 @@
-import React from 'react';
+import React from 'react'
 
-import { Editor } from 'slate-react';
-import { Value } from 'slate';
+import { Editor } from 'slate-react'
+import { Value } from 'slate'
 
-import { renderActions } from './Actions';
-import { HoverMenu } from './HoverMenu';
+import { renderActions } from './Actions'
+import { HoverMenu } from './HoverMenu'
 
 
 export interface ActionContent {
-  value: Value;
-  x: number;
-  y: number;
+  value: Value
+  x: number
+  y: number
 }
 
 export interface ActionEditorProps extends ActionContent {
-  cursor: 'move' | 'text' | null;
-  deleteAction: () => void;
-  onDragAction: (x: number, y: number) => void;
+  cursor: 'move' | 'text' | null
+  deleteAction: () => void
+  onDragAction: (x: number, y: number) => void
 }
 
 export interface ActionEditorState extends ActionContent {}
 
 export class ActionEditor extends React.Component<ActionEditorProps, ActionEditorState>  {
-  editor?: Editor;
-  containerRef = React.createRef<HTMLDivElement>();
+  editor?: Editor
+  containerRef = React.createRef<HTMLDivElement>()
   menuRef = React.createRef<HTMLDivElement>()
 
   constructor(props: ActionEditorProps) {
-    super(props);
+    super(props)
 
     this.state = {
       ...props,
-    };
+    }
   }
 
   ref = (editor: any) => {
@@ -47,20 +47,20 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
   }
 
   updateMenu = () => {
-    const containerRef: any = this.containerRef.current;
-    const menu: any = this.menuRef.current;
-    if (!containerRef || !menu) return;
+    const containerRef: any = this.containerRef.current
+    const menu: any = this.menuRef.current
+    if (!containerRef || !menu) return
 
-    const { selection } = this.state.value;
+    const { selection } = this.state.value
     if (selection.isBlurred) {
-      menu.style.opacity = 0;
-      return;
+      menu.style.opacity = 0
+      return
     }
 
-    const rect = containerRef.getBoundingClientRect();
-    menu.style.opacity = 1;
-    menu.style.top = `${rect.top - menu.offsetHeight}px`;
-    menu.style.left = `${rect.left - menu.offsetWidth / 2 + rect.width / 2}px`;
+    const rect = containerRef.getBoundingClientRect()
+    menu.style.opacity = 1
+    menu.style.top = `${rect.top - menu.offsetHeight}px`
+    menu.style.left = `${rect.left}px`
   }
 
   onKeyDown = (event: any, editor, next) => {
@@ -68,86 +68,86 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
       if (event.shiftKey === false) {
         return editor.insertBlock({
           type: 'action-main'
-        });
+        })
       } else {
         return editor.insertBlock({
           type: 'action-modifier'
-        });
+        })
       }
     }
-    return next();
+    return next()
   }
 
   onChange = ({ value }) => {
-    const editor = this.editor;
-    if (!editor) return;
+    const editor = this.editor
+    if (!editor) return
 
-    this.setState({ value });
+    this.setState({ value })
 
-    const xpActions = value.document.getInlinesByType('xp');
+    const xpActions = value.document.getInlinesByType('xp')
     const isSmall = value.document.getBlocks().some((value) => {
       return value.nodes.some((v1) => {
         if (v1.object === 'inline' && v1.type === 'xp')
-          return false;
+          return false
         else if (v1.object === 'text' && v1.text === '')
-          return false;
+          return false
         else
           return true
       })
     })
 
-    let size;
+    let size
     if (!isSmall && xpActions.size === 1 && value.document.nodes.size === 1) {
-      size = 'big';
+      size = 'big'
     } else {
-       size = 'small';
+       size = 'small'
     }
     xpActions.forEach((action) => {
-      const value = action.toJSON();
-      value.data = value.data || {};
+      const value = action.toJSON()
+      value.data = value.data || {}
       if (value.data.size !== size) {
-        value.data.size = size;
-        editor.replaceNodeByKey(action.key, value);
+        value.data.size = size
+        editor.replaceNodeByKey(action.key, value)
       }
-    });
+    })
   }
 
   onBlur = (event: any, editor, next) => {
-    const document = editor.value.document;
-    const text = document.text;
-    if (text !== '') return next();
+    const document = editor.value.document
+    const text = document.text
+    if (text !== '') return next()
 
-    const blocks = document.getBlocks();
-    if (blocks.size > 1) return next();
+    const blocks = document.getBlocks()
+    if (blocks.size > 1) return next()
 
-    const inlines = document.getInlines();
-    if (inlines.size > 0) return next();
+    const inlines = document.getInlines()
+    if (inlines.size > 0) return next()
 
-    this.props.deleteAction();
+    this.props.deleteAction()
   }
 
   onMouseDown = (e: any) => {
-    if (e.button !== 0 || this.props.cursor !== 'move') return;
+    if (e.button !== 0 || this.props.cursor !== 'move') return
 
-    e.preventDefault();
-    e.stopPropagation();
+    e.preventDefault()
+    e.stopPropagation()
 
-    this.props.onDragAction(e.clientX - this.props.x, e.clientY - this.props.y);
+    this.props.onDragAction(e.clientX - this.props.x, e.clientY - this.props.y)
   }
 
   onDragOver = (event: any, editor: any, next: any) => {
-    event.preventDefault();
-    event.stopPropagation();
-  };
+    event.preventDefault()
+    event.stopPropagation()
+  }
 
   onDrop = (event: any, editor: any, next: any) => {
-    event.preventDefault();
-    event.stopPropagation();
+    event.preventDefault()
+    event.stopPropagation()
 
-    const action = event.dataTransfer.getData('action');
-    if (typeof(action) !== 'string') return next();
+    const action = event.dataTransfer.getData('action')
+    if (typeof(action) !== 'string') return next()
 
-    const data = JSON.parse(event.dataTransfer.getData('data')) || {};
+    const data = JSON.parse(event.dataTransfer.getData('data')) || {}
     if (action === 'text') {
       editor.insertText('')
     } else {
@@ -155,15 +155,15 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
         ...data,
         object: 'inline',
         type: action,
-      });
+      })
     }
   }
 
   render() {
-    const style: any = {};
+    const style: any = {}
     if (this.props.cursor === 'move') {
-      style.cursor = 'move';
-      style.boxShadow = 'blue 0px 0px 0px 2px';
+      style.cursor = 'move'
+      style.boxShadow = 'blue 0px 0px 0px 2px'
     }
     return (
       <div
@@ -210,10 +210,26 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
     const { attributes, children, node } = props
 
     switch (node.type) {
-      case 'action-main':
-        return <div className="action-main" {...attributes}>{children}</div>
-      case 'action-modifier':
-        return <div className="action-modifier" {...attributes}>{children}</div>
+      case 'action-main': {
+        const { styles, ...attrs } = attributes
+        const fontSize = node.data.get('fontSize') || 18
+        const align = {
+          left: 'flex-start',
+          right: 'flex-end',
+        }[node.data.get('align')] || 'center'
+
+        return <div
+          className="action-main"
+          {...attrs}
+          style={{
+            ...(styles || {}),
+            fontSize: `${fontSize}pt`,
+            justifyContent: align
+          }}
+        >
+          {children}
+        </div>
+      }
       default:
         return next()
     }

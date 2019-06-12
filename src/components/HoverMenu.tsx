@@ -40,26 +40,72 @@ export const Menu = React.forwardRef<React.Ref<any>, any>((props, ref) => (
   />
 ))
 
-const BlockTypeButton = ({ editor }) => {
-  const { value } = editor;
-  const isActive = value.anchorBlock && value.anchorBlock.type === 'action-main';
+const FontSizeValueButton = ({ editor }) => {
+  const block = editor.value.anchorBlock
+  const blockData = (block && block.data) || new Map<string, any>()
+
+  return (
+    <span style={{color: 'white', padding: '0 4px', textAlign: 'center', minWidth: '2ems'}}>
+      {blockData.get('fontSize') || 18}pt
+    </span>
+  )
+}
+
+const FontSizeButton = ({ editor, type }) => {
+  const { value } = editor
+  const block = value.anchorBlock && (value.anchorBlock.toJSON() || {})
+  const isActive = block && block.type === 'action-main'
+
   return (
     <Button
       reversed
       active={isActive}
       onMouseDown={event => {
         event.preventDefault()
-        editor.setBlocks(isActive ? 'action-modifier' : 'action-main');
+
+        editor.setBlocks({
+          ...block,
+          data: {
+            ...block.data,
+            fontSize: (block.data.fontSize || 18) + (type === 'add' ? 1 : -1),
+          }
+        })
       }}
     >
-      <Icon>format_size</Icon>
+      <Icon>{`${type}_circle`}</Icon>
+    </Button>
+  )
+}
+
+const AlignButton = ({ editor, align }) => {
+  const { value } = editor
+  const block = value.anchorBlock && (value.anchorBlock.toJSON() || {})
+  const isActive = block && block.type === 'action-main' && (block.data.align || 'center') === align
+
+  return (
+    <Button
+      reversed
+      active={isActive}
+      onMouseDown={event => {
+        event.preventDefault()
+
+        editor.setBlocks({
+          ...block,
+          data: {
+            ...block.data,
+            align: align,
+          }
+        })
+      }}
+    >
+      <Icon>{`format_align_${align}`}</Icon>
     </Button>
   )
 }
 
 export const HoverMenu = React.forwardRef<React.Ref<any>, {editor: Editor}>((props, ref) => {
-  const root = window.document.getElementById('root');
-  if (!root) return null;
+  const root = window.document.getElementById('root')
+  if (!root) return null
 
   return ReactDOM.createPortal(
     <Menu
@@ -77,7 +123,12 @@ export const HoverMenu = React.forwardRef<React.Ref<any>, {editor: Editor}>((pro
         transition: 'opacity 0.75s',
       }}
     >
-      <BlockTypeButton editor={props.editor} />
+      <FontSizeButton editor={props.editor} type='remove' />
+      <FontSizeValueButton editor={props.editor} />
+      <FontSizeButton editor={props.editor} type='add' />
+      <AlignButton editor={props.editor} align='left' />
+      <AlignButton editor={props.editor} align='center' />
+      <AlignButton editor={props.editor} align='right' />
     </Menu>,
     root
   )
