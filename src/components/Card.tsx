@@ -364,8 +364,8 @@ export class Card extends React.Component<CardProps, CardState> {
               onChange={this.onInitiativeChange}
             />
 
-            {this.state.summonTop ? <Summon className='summon-top center runes'/> : ''}
-            {this.state.summonBottom ? <Summon className='summon-bottom center runes'/> : ''}
+            {this.state.summonTop && <Summon className='summon-top center runes'/>}
+            {this.state.summonBottom && <Summon className='summon-bottom center runes'/>}
 
             {Object.entries(this.state.actions).map(([key, value]) => {
               return <ActionEditor

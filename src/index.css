@@ -118,6 +118,11 @@ img {
   top: 325px;
 }
 
+.actions .summon-top > img, .actions .summon-bottom > img {
+  position: relative;
+  left: 45px
+}
+
 .actions .summon {
   font-family: Nyala;
   font-size: 14pt;
