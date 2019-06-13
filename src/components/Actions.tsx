@@ -19,7 +19,7 @@ export const Action: React.FC<ActionProps> = (props) => {
   return (
     <div className='action'>
       <span>{data.iconOnly ? '' : data.text}</span>
-      {props.children && <span>{props.children}</span>}
+      {children && <span>{children}</span>}
       <img alt={data.text} src={require(`../assets/${data.icon}.png`)}/>
     </div>
   )
@@ -81,20 +81,94 @@ export class ActionPlugin {
     }
   }
 
+  onKeyDown = (event: any, editor: any, next: () => any) => {
+    if (event.keyCode === 37) {
+      const { document, selection } = editor.value
+      const { start } = selection
+
+      if (start.offset !== 0) return next()
+      
+      let node = document.getPreviousNode(start.key)
+      if (!Inline.isInline(node) || (node.type !== 'action' && node.type !== 'element')) return next()
+
+      let text = document.getPreviousText(node.key)
+      while (text && node.hasDescendant(text.key)) {
+        text = document.getPreviousText(text.key)
+      }
+      if (!text) return next()
+
+      event.preventDefault()
+      event.stopPropagation()
+      editor.moveToEndOfNode(text).focus()
+    } else if (event.keyCode === 37) {
+      const { document, selection } = editor.value
+      const { start } = selection
+      
+      let node = document.getNextNode(start.key)
+      if (!Inline.isInline(node) || (node.type !== 'action' && node.type !== 'element')) return next()
+      
+      event.preventDefault()
+      event.stopPropagation()
+
+      let text = document.getNextText(node.key)
+      while (text && node.hasDescendant(text.key)) {
+        text = document.getNextText(text.key)
+      }
+      if (!text) return next()
+
+      event.preventDefault()
+      event.stopPropagation()
+      editor.moveToStartOfNode(text).focus()
+    }
+    return next()
+  }
+
   onClick = (event: any, editor: any, next: () => any) => {
     const node = editor.findNode(event.target)
-    if (!Inline.isInline(node) || node.type !== 'element') return next()
+    if (Inline.isInline(node) && node.type === 'action') {
+      event.preventDefault()
+      event.stopPropagation()
 
-    const inline = node.toJSON()
-    const data = inline.data || {}
+      const { document } = editor.value
 
-    editor.replaceNodeByKey(node.key, {
-      ...inline,
-      data: {
-        ...data,
-        consume: !data.consume,
-      },
-    })
+      const target = editor.findDOMNode(editor.value.document.getPath(node.key))
+      const rect = target.getBoundingClientRect()
+      const x = event.clientX - rect.left
+      const width = target.clientWidth
+      if (x > (width / 2)) {
+        let text = document.getNextText(node.key)
+        while (text && node.hasDescendant(text.key)) {
+          text = document.getNextText(text.key)
+        }
+        if (text) {
+          editor.moveToStartOfNode(text).focus()
+        }
+      } else {
+        let text = document.getPreviousText(node.key)
+        while (text && node.hasDescendant(text.key)) {
+          text = document.getPreviousText(text.key)
+        }
+        if (text) {
+          editor.moveToEndOfNode(text).focus()
+        }
+      }
+    } else if (Inline.isInline(node) && node.type === 'element') {
+      event.preventDefault()
+      event.stopPropagation()
+
+      const inline = node.toJSON()
+      const data = inline.data || {}
+
+      editor.replaceNodeByKey(node.key, {
+        ...inline,
+        data: {
+          ...data,
+          consume: !data.consume,
+        },
+      })
+    } else {
+      return next()
+    }
   }
 
   onDragOver = (event: any, editor: any, next: () => any) => {

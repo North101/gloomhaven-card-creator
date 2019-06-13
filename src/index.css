@@ -193,7 +193,6 @@ img {
 }
 
 .action {
-  margin: 0 2px;
   position: relative;
   display: inline-flex;
   justify-content: center;
@@ -308,6 +307,10 @@ img {
 .toolbar > div > input {
    width: 25px;
    height: 25px;
+}
+
+[data-slate-object=text] {
+  min-width: 1px;
 }
 
 @media print {
