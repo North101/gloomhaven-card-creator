@@ -275,10 +275,17 @@ img {
   flex-direction: column;
 }
 
+.toolbar-container {
+  display: flex;
+  flex-direction: row;
+  padding: 0 10px;
+  margin-bottom: 10px;
+  background: grey;
+}
+
 .toolbar {
   position: relative;
-  padding: 10px;
-  margin-bottom: 10px;
+  padding: 10px 0;
   overflow-y: overlay;
   min-height: fit-content;
 
