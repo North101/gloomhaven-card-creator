@@ -1,10 +1,15 @@
 import React from 'react'
 
 import { Editor } from 'slate-react'
-import { Value, Inline } from 'slate'
+import { Value } from 'slate'
 
-import { renderActions } from './Actions'
+import { ActionPlugin } from './Actions'
 import { HoverMenu } from './HoverMenu'
+
+
+const PLUGINS = [
+  new ActionPlugin(),
+] as any
 
 
 export interface ActionContent {
@@ -63,55 +68,6 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
     menu.style.left = `${rect.left}px`
   }
 
-  onKeyDown = (event: any, editor, next) => {
-    if (event.key === 'Enter') {
-      if (event.shiftKey === false) {
-        return editor.insertBlock({
-          type: 'action-main'
-        })
-      } else {
-        return editor.insertBlock({
-          type: 'action-modifier'
-        })
-      }
-    }
-    return next()
-  }
-
-  onChange = ({ value }) => {
-    const editor = this.editor
-    if (!editor) return
-
-    this.setState({ value })
-
-    const xpActions = value.document.getInlinesByType('xp')
-    const isSmall = value.document.getBlocks().some((value) => {
-      return value.nodes.some((v1) => {
-        if (v1.object === 'inline' && v1.type === 'xp')
-          return false
-        else if (v1.object === 'text' && v1.text === '')
-          return false
-        else
-          return true
-      })
-    })
-
-    let size
-    if (!isSmall && xpActions.size === 1 && value.document.nodes.size === 1) {
-      size = 'big'
-    } else {
-       size = 'small'
-    }
-    xpActions.forEach((action) => {
-      const value = action.toJSON()
-      value.data = value.data || {}
-      if (value.data.size !== size) {
-        value.data.size = size
-        editor.replaceNodeByKey(action.key, value)
-      }
-    })
-  }
-
   onBlur = (event: any, editor, next) => {
     const document = editor.value.document
     const text = document.text
@@ -135,46 +91,10 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
     this.props.onDragAction(e.clientX - this.props.x, e.clientY - this.props.y)
   }
 
-  onDragOver = (event: any, editor: any, next: any) => {
-    event.preventDefault()
-    event.stopPropagation()
-  }
-
-  onDrop = (event: any, editor: any, next: any) => {
-    event.preventDefault()
-    event.stopPropagation()
-
-    const action = event.dataTransfer.getData('action')
-    if (!action) return next()
-
-    const data = JSON.parse(event.dataTransfer.getData('data')) || {}
-    if (action === 'text') {
-      editor.insertText('')
-    } else {
-      editor.insertInline({
-        ...data,
-        object: 'inline',
-        type: action,
-      })
-    }
-  }
-
-  onClick = (event: any, editor: any, next: any) => {
-    const node = editor.findNode(event.target)
-    if (!Inline.isInline(node) || !node.type.startsWith('element-')) return next()
-
-    const json = node.toJSON()
-    const jsonData = json.data || {}
-
-    editor.replaceNodeByKey(node.key, {
-      ...json,
-      data: {
-        ...jsonData,
-        consume: !jsonData.consume,
-      },
+  onChange = ({ value }) => {
+    this.setState({
+      value,
     })
-
-    return next()
   }
 
   render() {
@@ -194,21 +114,17 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
         ref={this.containerRef}
       >
         <Editor
+          plugins={PLUGINS}
           autoFocus
           spellCheck={false}
           readOnly={this.props.cursor !== 'text'}
           ref={this.ref}
           value={this.state.value}
-          onKeyDown={this.onKeyDown}
-          onClick={this.onClick}
           onChange={this.onChange}
           onBlur={this.onBlur}
-          onDrop={this.onDrop}
-          onDragOver={this.onDragOver}
           renderEditor={this.renderEditor}
           renderMark={this.renderMark}
           renderBlock={this.renderBlock}
-          renderInline={renderActions}
         />
       </div>
     )

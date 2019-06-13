@@ -173,19 +173,6 @@ img {
   left: 300px;
 }
 
-.action {
-  position: relative;
-  display: inline-flex;
-  justify-content: center;
-  align-items: center;
-}
-
-.action img {
-  height: 1.1em;
-  width: auto;
-  padding: 0 2px;
-}
-
 .actions [data-slate-object=block] {
   position: relative;
   display: flex;
@@ -205,12 +192,23 @@ img {
   padding: 0 2px;
 }
 
+.action {
+  margin: 0 2px;
+  position: relative;
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.action img {
+  height: 1.1em;
+  width: auto;
+  padding: 0 2px;
+}
+
 .action > div {
   display: inline-block;
   text-align: center;
-  /*display: inline-flex;
-  justify-items: center;
-  align-items: center;*/
 }
 
 .action.element img {
@@ -227,11 +225,6 @@ img {
   position: absolute;
   top: 0;
   left: 0;
-}
-
-.action.status img {
-  height: 1.3em;
-  width: auto;
 }
 
 .action.big-icon img {
@@ -315,11 +308,6 @@ img {
 .toolbar > div > input {
    width: 25px;
    height: 25px;
-}
-
-.inline-action {
-  margin: 0 2px;
-  display: inline-flex;
 }
 
 @media print {

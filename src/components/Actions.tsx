@@ -1,444 +1,154 @@
 import React from 'react'
 
+import { Inline } from 'slate'
+
 
 export interface ActionProps {
-  className?: string
-  text: string
-  action: string
-  icon?: any
-  iconOnly?: boolean
-  data?: {
+  data: {
+    text: string
+    icon: any
+    iconOnly?: boolean
     [key: string]: any
   }
   children?: any
 }
 
 export const Action: React.FC<ActionProps> = (props) => {
+  const { data, children } = props
+
   return (
-    <div className={props.className || 'action'}>
-      <span>{props.data && props.data.iconOnly ? '' : props.text}</span>
+    <div className='action'>
+      <span>{data.iconOnly ? '' : data.text}</span>
       {props.children && <span>{props.children}</span>}
-      <img alt={props.text} src={props.icon || require(`../assets/${props.action}.png`)}/>
-    </div>
-  )
-}
-
-export const AttackAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Attack',
-  action: 'attack',
-  ...props,
-})
-export const HealAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Heal',
-  action: 'heal',
-  ...props,
-})
-export const RangeAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Range',
-  action: 'range',
-  ...props,
-})
-export const TargetAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Target',
-  action: 'target',
-  ...props,
-})
-export const MoveAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Move',
-  action: 'move',
-  ...props,
-})
-export const JumpAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Jump',
-  action: 'jump',
-  ...props,
-})
-export const FlyingAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Flying',
-  action: 'flying',
-  ...props,
-})
-export const ShieldAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Shield',
-  action: 'shield',
-  ...props,
-})
-export const RetaliateAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Retaliate',
-  action: 'retaliate',
-  ...props,
-})
-export const LootAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Loot',
-  action: 'loot',
-  ...props,
-})
-
-export const StatusAction: React.FC<ActionProps> = (props) => Action({className: 'action status',
-  ...props,
-})
-
-export const AddTargetEffectAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'ADD TARGET',
-  action: 'effect-add-target',
-  ...props,
-})
-export const PierceEffectAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'PIECE',
-  action: 'effect-pierce',
-  ...props,
-})
-export const PushEffectAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'PUSH',
-  action: 'effect-push',
-  ...props,
-})
-export const PullEffectAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'PULL',
-  action: 'effect-pull',
-  ...props,
-})
-
-export const PoisonStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'POISON',
-  action: 'status-poison',
-  ...props,
-})
-export const WoundStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'WOUND',
-  action: 'status-wound',
-  ...props,
-})
-export const ImmobilizeStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'IMMOBILIZE',
-  action: 'status-immobilize',
-  ...props,
-})
-export const DisarmStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'DISARM',
-  action: 'status-disarm',
-  ...props,
-})
-export const StunStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'STUN',
-  action: 'status-stun',
-  ...props,
-})
-export const MuddleStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'MUDDLE',
-  action: 'status-muddle',
-  ...props,
-})
-export const CurseAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'CURSE',
-  action: 'curse',
-  ...props,
-})
-
-export const InvisibleStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'INVISIBLE',
-  action: 'status-invisible',
-  ...props,
-})
-export const StrengthenStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'STRENGTHEN',
-  action: 'status-strengthen',
-  ...props,
-})
-export const BlessAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
-  text: 'BLESS',
-  action: 'bless',
-  ...props,
-})
-
-export const XPAction: React.FC<ActionProps> = (props) => {
-  return (
-    <div className={`action xp ${props.data && props.data.size}`}>
-      <img alt='xp' src={require('../assets/xp.png')}/>
-      <span>{props.children}</span>
+      <img alt={data.text} src={require(`../assets/${data.icon}.png`)}/>
     </div>
   )
 }
 
 export const ElementAction: React.FC<ActionProps> = (props) => {
-  props = {
-    className: 'action element',
-    ...props,
-    data: {
-      iconOnly: true,
-      ...props.data,
-    }
-  }
+  const { data, children } = props
 
   return (
-    <div className={props.className || 'action'}>
-      <span>{props.data && props.data.iconOnly ? '' : props.text}</span>
-      {props.children && <span>{props.children}</span>}
+    <div className='action element'>
+      <span>{data.iconOnly ? '' : data.text}</span>
+      {children && <span>{children}</span>}
       <div>
-        <img alt={props.text} src={props.icon || require(`../assets/${props.action}.png`)}/>
-        {props.data && props.data.consume &&
-          <img className='consume' alt='consume' src={props.icon || require(`../assets/consume-element.png`)}/>
+        <img alt={data.text} src={require(`../assets/${data.icon}.png`)}/>
+        {data.consume &&
+          <img className='consume' alt='consume' src={require(`../assets/consume-element.png`)}/>
         }
       </div>
     </div>
   )
 }
 
-export const AllElementAction: React.FC<Partial<ActionProps>> = (props) => ElementAction({
-  text: 'All',
-  action: 'element-all',
-  ...props,
-})
-export const FireElementAction: React.FC<Partial<ActionProps>> = (props) => ElementAction({
-  text: 'Fire',
-  action: 'element-fire',
-  ...props,
-})
-export const IceElementAction: React.FC<Partial<ActionProps>> = (props) => ElementAction({
-  text: 'Ice',
-  action: 'element-ice',
-  ...props,
-})
-export const AirElementAction: React.FC<Partial<ActionProps>> = (props) => ElementAction({
-  text: 'Air',
-  action: 'element-air',
-  ...props,
-})
-export const EarthElementAction: React.FC<Partial<ActionProps>> = (props) => ElementAction({
-  text: 'Earth',
-  action: 'element-earth',
-  ...props,
-})
-export const DarkElementAction: React.FC<Partial<ActionProps>> = (props) => ElementAction({
-  text: 'Dark',
-  action: 'element-dark',
-  ...props,
-})
-export const LightElementAction: React.FC<Partial<ActionProps>> = (props) => ElementAction({
-  text: 'Light',
-  action: 'element-light',
-  ...props,
-})
+export const XPAction: React.FC<ActionProps> = (props) => {
+  const { data, children } = props
 
-export const RoundAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  className: 'action big-icon',
-  text: 'Round',
-  action: 'round',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
-export const PersistentAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  className: 'action big-icon',
-  text: 'Persistent',
-  action: 'persistent',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
+  return (
+    <div className={`action xp ${data.size}`}>
+      <img alt='xp' src={require('../assets/xp.png')}/>
+      <span>{children}</span>
+    </div>
+  )
+}
 
-export const CardLostAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  className: 'action big-icon',
-  text: 'Lost',
-  action: 'card-lost',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
-export const CardRecoverAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  className: 'action big-icon',
-  text: 'Recover',
-  action: 'card-recover',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
-export const CardUnrecoverableAction: React.FC<Partial<ActionProps>> = (props) => Action({
-  className: 'action big-icon',
-  text: 'Unrecoverable',
-  action: 'card-unrecoverable',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
+export class ActionPlugin {
+  renderInline = (props: any, editor: any, next: () => any) => {
+    const { attributes, children, node } = props
 
-export const ItemHead: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Head',
-  action: 'item-head',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
-export const ItemBody: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Body',
-  action: 'item-body',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
-export const ItemFeet: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Feet',
-  action: 'item-feet',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
-export const ItemOneHand: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'One Hand',
-  action: 'item-onehand',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
-export const ItemTwoHands: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Two Hands',
-  action: 'item-twohands',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
-export const ItemSmall: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Small',
-  action: 'item-small',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
-export const ItemRefresh: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Refresh',
-  action: 'item-refresh',
-  ...props,
-})
-export const ItemSpent: React.FC<Partial<ActionProps>> = (props) => Action({
-  text: 'Spent',
-  action: 'item-spent',
-  ...props,
-})
-
-export function renderActions(props: any, editor: any, next: () => any) {
-  const { attributes, children, node } = props
-
-  const childAttributes: any = {
-    data: Object.fromEntries(node.data),
-    children: children,
+    switch (node.type) {
+      case 'action':
+        return <div className="inline-action" {...attributes}>
+          <Action data={Object.fromEntries(node.data) as any}>
+            {children}
+          </Action>
+        </div>
+      case 'element':
+        return <div className="inline-action" {...attributes}>
+          <ElementAction data={Object.fromEntries(node.data) as any}>
+            {children}
+          </ElementAction>
+        </div>
+      case 'xp':
+        return <div className="inline-action" {...attributes}>
+          <XPAction data={Object.fromEntries(node.data) as any}>
+            {children}
+          </XPAction>
+        </div>
+      default:
+        return next()
+    }
   }
 
-  switch (node.type) {
-    case 'attack':
-      return <div className="inline-action" {...attributes}><AttackAction {...childAttributes}/></div>
-    case 'heal':
-      return <div className="inline-action" {...attributes}><HealAction {...childAttributes}/></div>
-    case 'range':
-      return <div className="inline-action" {...attributes}><RangeAction {...childAttributes}/></div>
-    case 'target':
-      return <div className="inline-action" {...attributes}><TargetAction {...childAttributes}/></div>
-    case 'move':
-      return <div className="inline-action" {...attributes}><MoveAction {...childAttributes}/></div>
-    case 'jump':
-      return <div className="inline-action" {...attributes}><JumpAction {...childAttributes}/></div>
-    case 'flying':
-      return <div className="inline-action" {...attributes}><FlyingAction {...childAttributes}/></div>
-    case 'shield':
-      return <div className="inline-action" {...attributes}><ShieldAction {...childAttributes}/></div>
-    case 'retaliate':
-      return <div className="inline-action" {...attributes}><RetaliateAction {...childAttributes}/></div>
-    case 'loot':
-      return <div className="inline-action" {...attributes}><LootAction {...childAttributes}/></div>
-    case 'xp':
-      return <div className="inline-action" {...attributes}><XPAction {...childAttributes}/></div>
-    case 'round':
-      return <div className="inline-action" {...attributes}><RoundAction {...childAttributes}/></div>
-    case 'persistent':
-      return <div className="inline-action" {...attributes}><PersistentAction {...childAttributes}/></div>
-    case 'element-all':
-      return <div className="inline-action" {...attributes}><AllElementAction {...childAttributes}/></div>
-    case 'element-fire':
-      return <div className="inline-action" {...attributes}><FireElementAction {...childAttributes}/></div>
-    case 'element-ice':
-      return <div className="inline-action" {...attributes}><IceElementAction {...childAttributes}/></div>
-    case 'element-air':
-      return <div className="inline-action" {...attributes}><AirElementAction {...childAttributes}/></div>
-    case 'element-earth':
-      return <div className="inline-action" {...attributes}><EarthElementAction {...childAttributes}/></div>
-    case 'element-light':
-      return <div className="inline-action" {...attributes}><LightElementAction {...childAttributes}/></div>
-    case 'element-dark':
-      return <div className="inline-action" {...attributes}><DarkElementAction {...childAttributes}/></div>
-    case 'effect-add-target':
-      return <div className="inline-action" {...attributes}><AddTargetEffectAction {...childAttributes}/></div>
-    case 'effect-push':
-      return <div className="inline-action" {...attributes}><PushEffectAction {...childAttributes}/></div>
-    case 'effect-pull':
-      return <div className="inline-action" {...attributes}><PullEffectAction {...childAttributes}/></div>
-    case 'effect-pierce':
-      return <div className="inline-action" {...attributes}><PierceEffectAction {...childAttributes}/></div>
-    case 'status-poison':
-      return <div className="inline-action" {...attributes}><PoisonStatusAction {...childAttributes}/></div>
-    case 'status-wound':
-      return <div className="inline-action" {...attributes}><WoundStatusAction {...childAttributes}/></div>
-    case 'status-immobilize':
-      return <div className="inline-action" {...attributes}><ImmobilizeStatusAction {...childAttributes}/></div>
-    case 'status-disarm':
-      return <div className="inline-action" {...attributes}><DisarmStatusAction {...childAttributes}/></div>
-    case 'status-stun':
-      return <div className="inline-action" {...attributes}><StunStatusAction {...childAttributes}/></div>
-    case 'status-muddle':
-      return <div className="inline-action" {...attributes}><MuddleStatusAction {...childAttributes}/></div>
-    case 'curse':
-      return <div className="inline-action" {...attributes}><CurseAction {...childAttributes}/></div>
-    case 'status-invisible':
-      return <div className="inline-action" {...attributes}><InvisibleStatusAction {...childAttributes}/></div>
-    case 'status-strengthen':
-      return <div className="inline-action" {...attributes}><StrengthenStatusAction {...childAttributes}/></div>
-    case 'bless':
-      return <div className="inline-action" {...attributes}><BlessAction {...childAttributes}/></div>
-    case 'card-lost':
-      return <div className="inline-action" {...attributes}><CardLostAction {...childAttributes}/></div>
-    case 'card-recover':
-      return <div className="inline-action" {...attributes}><CardRecoverAction {...childAttributes}/></div>
-    case 'card-unrecoverable':
-      return <div className="inline-action" {...attributes}><CardUnrecoverableAction {...childAttributes}/></div>
+  onClick = (event: any, editor: any, next: () => any) => {
+    const node = editor.findNode(event.target)
+    if (!Inline.isInline(node) || node.type !== 'element') return next()
 
-    case 'item-head':
-      return <div className="inline-action" {...attributes}><ItemHead {...childAttributes}/></div>
-    case 'item-body':
-      return <div className="inline-action" {...attributes}><ItemBody {...childAttributes}/></div>
-    case 'item-feet':
-      return <div className="inline-action" {...attributes}><ItemFeet {...childAttributes}/></div>
-    case 'item-onehand':
-      return <div className="inline-action" {...attributes}><ItemOneHand {...childAttributes}/></div>
-    case 'item-twohands':
-      return <div className="inline-action" {...attributes}><ItemTwoHands {...childAttributes}/></div>
-    case 'item-small':
-      return <div className="inline-action" {...attributes}><ItemSmall {...childAttributes}/></div>
+    const inline = node.toJSON()
+    const data = inline.data || {}
 
-    case 'item-refresh':
-      return <div className="inline-action" {...attributes}><ItemRefresh {...childAttributes}/></div>
-    case 'item-spent':
-      return <div className="inline-action" {...attributes}><ItemSpent {...childAttributes}/></div>
-    default:
-      return next()
+    editor.replaceNodeByKey(node.key, {
+      ...inline,
+      data: {
+        ...data,
+        consume: !data.consume,
+      },
+    })
+  }
+
+  onDragOver = (event: any, editor: any, next: () => any) => {
+    event.preventDefault()
+    event.stopPropagation()
+  }
+
+  onDrop = (event: any, editor: any, next: () => any) => {
+    event.preventDefault()
+    event.stopPropagation()
+
+    const type = event.dataTransfer.getData('type')
+    if (!type) return next()
+
+    const data = JSON.parse(event.dataTransfer.getData('extra')) || {}
+    if (type === 'text') {
+      editor.insertText('')
+    } else if (type !== 'hex') {
+      editor.insertInline({
+        object: 'inline',
+        ...data,
+      })
+    }
+  }
+
+  onChange = (editor: any, next: () => any) => {
+    const { value } = editor
+    const xpActions = value.document.getInlinesByType('xp')
+    const isSmall = value.document.getBlocks().some((value) => {
+      return value.nodes.some((v1) => {
+        if (v1.object === 'inline' && v1.type === 'xp')
+          return false
+        else if (v1.object === 'text' && v1.text === '')
+          return false
+        else
+          return true
+      })
+    })
+
+    let size
+    if (!isSmall && xpActions.size === 1 && value.document.nodes.size === 1) {
+      size = 'big'
+    } else {
+       size = 'small'
+    }
+    xpActions.forEach((action) => {
+      const value = action.toJSON()
+      value.data = value.data || {}
+      if (value.data.size !== size) {
+        value.data.size = size
+        editor.replaceNodeByKey(action.key, value)
+      }
+    })
+
+    return next()
   }
 }

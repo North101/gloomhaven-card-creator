@@ -89,21 +89,15 @@ export class Card extends React.Component<CardProps, CardState> {
     e.preventDefault()
     e.stopPropagation()
 
-    const action = e.dataTransfer.getData('action')
-    if (!action) return false
+    const type = e.dataTransfer.getData('type')
+    if (!type) return false
 
-    const data = JSON.parse(e.dataTransfer.getData('data')) || {}
+    const data = JSON.parse(e.dataTransfer.getData('extra') || '{}')
     const rect = e.target.getBoundingClientRect()
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
     
-    if (action === 'hex-enemy-horizontal' || action === 'hex-enemy-vertical') {
-      let orientation
-      if (action === 'hex-enemy-horizontal') {
-        orientation = 'horizontal'
-      } else {
-        orientation = 'vertical'
-      }
+    if (type === 'hex') {
       this.setState({
         hexes: {
           ...this.state.hexes,
@@ -113,13 +107,13 @@ export class Card extends React.Component<CardProps, CardState> {
             height: 35,
             x: x,
             y: y,
-            orientation: orientation,
+            orientation: data.orientation,
           },
         },
       })
     } else {
       let value: Value
-      if (action === 'text') {
+      if (type === 'text') {
         value = Value.fromJSON({
           object: 'value',
           document: {
@@ -134,7 +128,7 @@ export class Card extends React.Component<CardProps, CardState> {
             }],
           },
         } as any)
-      } else {
+      } else if (type === 'action' || type === 'element' || type === 'xp') {
         value = Value.fromJSON({
           object: 'value',
           document: {
@@ -143,13 +137,14 @@ export class Card extends React.Component<CardProps, CardState> {
               object: 'block',
               type: 'action-main',
               nodes: [{
-                ...data,
                 object: 'inline',
-                type: action,
+                ...data,
               }],
             }],
         },
         } as any)
+      } else {
+        return
       }
 
       this.setState({
@@ -398,6 +393,7 @@ export class Card extends React.Component<CardProps, CardState> {
         </div>
         <img
           src={require('../assets/summon1.png')}
+          alt='summon top'
           className="summon-toggle top"
           style={{
             filter: this.state.summonTop ? undefined : 'grayscale()',
@@ -406,6 +402,7 @@ export class Card extends React.Component<CardProps, CardState> {
         />
         <img
           src={require('../assets/summon2.png')}
+          alt='summon bottom'
           className="summon-toggle bottom"
           style={{
             filter: this.state.summonBottom ? undefined : 'grayscale()',

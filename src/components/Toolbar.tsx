@@ -3,7 +3,6 @@ import React from 'react'
 import { throttle } from 'throttle-debounce'
 
 
-
 export interface ToolbarProps {
   color: string
   onColorChange: (color: string) => void
@@ -43,8 +42,8 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
   }
 
   onDragStart = (e: any) => {
-    e.dataTransfer.setData('action', 'text')
-    e.dataTransfer.setData('data', JSON.stringify({}))
+    e.dataTransfer.setData('type', 'text')
+    e.dataTransfer.setData('extra', JSON.stringify({}))
     e.dataTransfer.dropEffect = 'copy'
   }
 
@@ -74,88 +73,112 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
           <div className='material-icons md-light' draggable onDragStart={this.onDragStart} onClick={this.onTextClick}>edit</div>
         </div>
         <div className='toolbar'>
-          <ToolbarIcon action='hex-enemy-vertical' />
-          <ToolbarIcon action='hex-enemy-horizontal' />
+          <ToolbarIcon type='hex' icon='hex-enemy-vertical' orientation='vertical' />
+          <ToolbarIcon type='hex' icon='hex-enemy-horizontal' orientation='horizontal' />
           
-          <ToolbarIcon action='attack' />
-          <ToolbarIcon action='heal' />
-          <ToolbarIcon action='range' />
-          <ToolbarIcon action='target' />
-          <ToolbarIcon action='move' />
-          <ToolbarIcon action='jump' />
-          <ToolbarIcon action='flying' />
-          <ToolbarIcon action='shield' />
-          <ToolbarIcon action='retaliate' />
-          <ToolbarIcon action='loot' />
-          <ToolbarIcon action='xp' data={{
-            nodes: [{
-              object: 'text',
-              text: '1',
-            }],
-          }} />
-          <ToolbarIcon action='round' />
-          <ToolbarIcon action='persistent' />
+          <ToolbarIcon type='action' icon='attack' text='Attack' />
+          <ToolbarIcon type='action' icon='heal' text='Heal' />
+          <ToolbarIcon type='action' icon='range' text='Range' />
+          <ToolbarIcon type='action' icon='target' text='Target' />
+          <ToolbarIcon type='action' icon='move' text='Move' />
+          <ToolbarIcon type='action' icon='jump' text='Jump' />
+          <ToolbarIcon type='action' icon='flying' text='Flying' />
+          <ToolbarIcon type='action' icon='shield' text='Shield' />
+          <ToolbarIcon type='action' icon='retaliate' text='Retaliate' />
+          <ToolbarIcon type='action' icon='loot' text='Loot' />
+          <ToolbarIcon type='xp' icon='xp' text='XP' nodes={[{
+            object: 'text',
+            text: '1',
+          }]} />
+          <ToolbarIcon type='action' icon='round' text='Round' iconOnly={true} />
+          <ToolbarIcon type='action' icon='persistent' text='Persistent' iconOnly={true} />
 
-          <ToolbarIcon action='element-all' />
-          <ToolbarIcon action='element-fire' />
-          <ToolbarIcon action='element-ice' />
-          <ToolbarIcon action='element-air' />
-          <ToolbarIcon action='element-earth' />
-          <ToolbarIcon action='element-light' />
-          <ToolbarIcon action='element-dark' />
+          <ToolbarIcon type='element' icon='element-all' text='All' iconOnly={true} />
+          <ToolbarIcon type='element' icon='element-fire' text='Fire' iconOnly={true} />
+          <ToolbarIcon type='element' icon='element-ice' text='Ice' iconOnly={true} />
+          <ToolbarIcon type='element' icon='element-air' text='Air' iconOnly={true} />
+          <ToolbarIcon type='element' icon='element-earth' text='Earth' iconOnly={true} />
+          <ToolbarIcon type='element' icon='element-light' text='Light' iconOnly={true} />
+          <ToolbarIcon type='element' icon='element-dark' text='Dark' iconOnly={true} />
 
-          <ToolbarIcon action='effect-add-target' />
-          <ToolbarIcon action='effect-push' />
-          <ToolbarIcon action='effect-pull' />
-          <ToolbarIcon action='effect-pierce' />
+          <ToolbarIcon type='action' icon='effect-add-target' text='ADD TARGET' />
+          <ToolbarIcon type='action' icon='effect-push' text='PUSH' />
+          <ToolbarIcon type='action' icon='effect-pull' text='PULL' />
+          <ToolbarIcon type='action' icon='effect-pierce' text='PIERCE' />
 
-          <ToolbarIcon action='status-poison' />
-          <ToolbarIcon action='status-wound' />
-          <ToolbarIcon action='status-immobilize' />
-          <ToolbarIcon action='status-disarm' />
-          <ToolbarIcon action='status-stun' />
-          <ToolbarIcon action='status-muddle' />
-          <ToolbarIcon action='curse' />
+          <ToolbarIcon type='action' icon='status-poison' text='POISON' />
+          <ToolbarIcon type='action' icon='status-wound' text='WOUND' />
+          <ToolbarIcon type='action' icon='status-immobilize' text='IMMOBILIZE' />
+          <ToolbarIcon type='action' icon='status-disarm' text='DISARM' />
+          <ToolbarIcon type='action' icon='status-stun' text='STUN' />
+          <ToolbarIcon type='action' icon='status-muddle' text='MUDDLE' />
+          <ToolbarIcon type='action' icon='curse' text='CURSE' />
 
-          <ToolbarIcon action='status-invisible' />
-          <ToolbarIcon action='status-strengthen' />
-          <ToolbarIcon action='bless' />
+          <ToolbarIcon type='action' icon='status-invisible' text='INVISIBLE' />
+          <ToolbarIcon type='action' icon='status-strengthen' text='STRENGTHEN' />
+          <ToolbarIcon type='action' icon='bless' text='BLESS' />
 
-          <ToolbarIcon action='card-lost' />
-          <ToolbarIcon action='card-recover' />
-          <ToolbarIcon action='card-unrecoverable' />
+          <ToolbarIcon type='action' icon='card-lost' text='card-lost' iconOnly={true} />
+          <ToolbarIcon type='action' icon='card-recover' text='card-recover' iconOnly={true} />
+          <ToolbarIcon type='action' icon='card-unrecoverable' text='card-unrecoverable' iconOnly={true} />
 
-          <ToolbarIcon action='item-head' />
-          <ToolbarIcon action='item-body' />
-          <ToolbarIcon action='item-feet' />
-          <ToolbarIcon action='item-onehand' />
-          <ToolbarIcon action='item-twohands' />
-          <ToolbarIcon action='item-small' />
+          <ToolbarIcon type='action' icon='item-head' text='Head' iconOnly={true} />
+          <ToolbarIcon type='action' icon='item-body' text='Body' iconOnly={true} />
+          <ToolbarIcon type='action' icon='item-feet' text='Feet' iconOnly={true} />
+          <ToolbarIcon type='action' icon='item-onehand' text='One Hand' iconOnly={true} />
+          <ToolbarIcon type='action' icon='item-twohands' text='Two Hands' iconOnly={true} />
+          <ToolbarIcon type='action' icon='item-small' text='Small' iconOnly={true} />
 
-          <ToolbarIcon action='item-spent' />
-          <ToolbarIcon action='item-refresh' />
+          <ToolbarIcon type='action' icon='item-spent' text='Spent' />
+          <ToolbarIcon type='action' icon='item-refresh' text='Refresh' />
         </div>
       </div>
     )
   }
 }
 
-export interface ToolbarIconProps {
-  action: string
-  icon?: any
+export interface ToolbarIconAction {
+  type: 'action' | 'element' | 'xp' | 'text'
+  nodes?: any
+  icon: string
+  iconOnly?: boolean
+  text: string
   data?: object
 }
 
+export interface ToolbarIconHex {
+  type: 'hex'
+  nodes?: any
+  icon: string
+  orientation: 'vertical' | 'horizontal'
+}
+
+export type ToolbarIconProps = ToolbarIconAction | ToolbarIconHex
+
 export const ToolbarIcon: React.FC<ToolbarIconProps> = (props) => {
   let onDragStart = (e: any) => {
-    e.dataTransfer.setData('action', props.action)
-    e.dataTransfer.setData('data', JSON.stringify(props.data || {}))
+    const { type } = props
+    let extra
+
+    if (type === 'hex') {
+      extra = props
+    } else {
+      const { type, nodes, ...data } = props
+      extra = {
+        type,
+        nodes,
+        data,
+      }
+    }
+
+    e.dataTransfer.setData('type', type)
+    e.dataTransfer.setData('extra', JSON.stringify(extra))
     e.dataTransfer.dropEffect = 'copy'
   }
 
   return (
     <div draggable onDragStart={onDragStart}>
-      <img alt={props.icon} src={props.icon || require(`../assets/${props.action}.png`)}/>
+      <img alt={props.icon} src={require(`../assets/${props.icon}.png`)}/>
     </div>
   )
 }

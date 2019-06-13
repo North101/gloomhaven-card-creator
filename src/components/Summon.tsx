@@ -4,7 +4,12 @@ import { Editor } from 'slate-react'
 import { Value } from 'slate'
 import Plain from 'slate-plain-serializer'
 
-import { renderActions } from './Actions'
+import { ActionPlugin } from './Actions'
+
+
+const PLUGINS = [
+  new ActionPlugin(),
+] as any
 
 
 export interface SummonProps {
@@ -37,8 +42,9 @@ export class Summon extends React.Component<SummonProps, SummonState> {
               nodes: [
                 {
                   object: 'inline',
-                  type: 'heal',
+                  type: 'action',
                   data: {
+                    icon: 'heal',
                     iconOnly: true,
                   }
                 },
@@ -62,8 +68,9 @@ export class Summon extends React.Component<SummonProps, SummonState> {
               nodes: [
                 {
                   object: 'inline',
-                  type: 'attack',
+                  type: 'action',
                   data: {
+                    icon: 'attack',
                     iconOnly: true,
                   }
                 },
@@ -87,8 +94,9 @@ export class Summon extends React.Component<SummonProps, SummonState> {
               nodes: [
                 {
                   object: 'inline',
-                  type: 'move',
+                  type: 'action',
                   data: {
+                    icon: 'move',
                     iconOnly: true,
                   }
                 },
@@ -112,8 +120,9 @@ export class Summon extends React.Component<SummonProps, SummonState> {
               nodes: [
                 {
                   object: 'inline',
-                  type: 'range',
+                  type: 'action',
                   data: {
+                    icon: 'range',
                     iconOnly: true,
                   }
                 },
@@ -182,38 +191,39 @@ export class Summon extends React.Component<SummonProps, SummonState> {
       <div className={this.props.className}>
         <img alt='summon' src={require('../assets/summon.png')}/>
         <Editor
+          plugins={PLUGINS}
           className='summon name single-line'
           value={this.state.name}
           onChange={this.onNameChange}
         />
         <Editor
+          plugins={PLUGINS}
           className='summon box1'
           value={this.state.box1}
-          renderInline={renderActions}
           onChange={this.onBox1Change}
         />
         <Editor
+          plugins={PLUGINS}
           className='summon box2'
           value={this.state.box2}
-          renderInline={renderActions}
           onChange={this.onBox2Change}
         />
         <Editor
+          plugins={PLUGINS}
           className='summon box3'
           value={this.state.box3}
-          renderInline={renderActions}
           onChange={this.onBox3Change}
         />
         <Editor
+          plugins={PLUGINS}
           className='summon box4'
           value={this.state.box4}
-          renderInline={renderActions}
           onChange={this.onBox4Change}
         />
         <Editor
+          plugins={PLUGINS}
           className='summon box5'
           value={this.state.box5}
-          renderInline={renderActions}
           onChange={this.onBox5Change}
         />
       </div>
