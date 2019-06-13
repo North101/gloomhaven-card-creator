@@ -26,124 +26,124 @@ export const Action: React.FC<ActionProps> = (props) => {
 export const AttackAction: React.FC<Partial<ActionProps>> = (props) => Action({
   text: 'Attack',
   action: 'attack',
-  ...props
+  ...props,
 })
 export const HealAction: React.FC<Partial<ActionProps>> = (props) => Action({
   text: 'Heal',
   action: 'heal',
-  ...props
+  ...props,
 })
 export const RangeAction: React.FC<Partial<ActionProps>> = (props) => Action({
   text: 'Range',
   action: 'range',
-  ...props
+  ...props,
 })
 export const TargetAction: React.FC<Partial<ActionProps>> = (props) => Action({
   text: 'Target',
   action: 'target',
-  ...props
+  ...props,
 })
 export const MoveAction: React.FC<Partial<ActionProps>> = (props) => Action({
   text: 'Move',
   action: 'move',
-  ...props
+  ...props,
 })
 export const JumpAction: React.FC<Partial<ActionProps>> = (props) => Action({
   text: 'Jump',
   action: 'jump',
-  ...props
+  ...props,
 })
 export const FlyingAction: React.FC<Partial<ActionProps>> = (props) => Action({
   text: 'Flying',
   action: 'flying',
-  ...props
+  ...props,
 })
 export const ShieldAction: React.FC<Partial<ActionProps>> = (props) => Action({
   text: 'Shield',
   action: 'shield',
-  ...props
+  ...props,
 })
 export const RetaliateAction: React.FC<Partial<ActionProps>> = (props) => Action({
   text: 'Retaliate',
   action: 'retaliate',
-  ...props
+  ...props,
 })
 export const LootAction: React.FC<Partial<ActionProps>> = (props) => Action({
   text: 'Loot',
   action: 'loot',
-  ...props
+  ...props,
 })
 
 export const StatusAction: React.FC<ActionProps> = (props) => Action({className: 'action status',
-  ...props
+  ...props,
 })
 
 export const AddTargetEffectAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'ADD TARGET',
   action: 'effect-add-target',
-  ...props
+  ...props,
 })
 export const PierceEffectAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'PIECE',
   action: 'effect-pierce',
-  ...props
+  ...props,
 })
 export const PushEffectAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'PUSH',
   action: 'effect-push',
-  ...props
+  ...props,
 })
 export const PullEffectAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'PULL',
   action: 'effect-pull',
-  ...props
+  ...props,
 })
 
 export const PoisonStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'POISON',
   action: 'status-poison',
-  ...props
+  ...props,
 })
 export const WoundStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'WOUND',
   action: 'status-wound',
-  ...props
+  ...props,
 })
 export const ImmobilizeStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'IMMOBILIZE',
   action: 'status-immobilize',
-  ...props
+  ...props,
 })
 export const DisarmStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'DISARM',
   action: 'status-disarm',
-  ...props
+  ...props,
 })
 export const StunStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'STUN',
   action: 'status-stun',
-  ...props
+  ...props,
 })
 export const MuddleStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'MUDDLE',
   action: 'status-muddle',
-  ...props
+  ...props,
 })
 export const CurseAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'CURSE',
   action: 'curse',
-  ...props
+  ...props,
 })
 
 export const InvisibleStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'INVISIBLE',
   action: 'status-invisible',
-  ...props
+  ...props,
 })
 export const StrengthenStatusAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'STRENGTHEN',
   action: 'status-strengthen',
-  ...props
+  ...props,
 })
 export const BlessAction: React.FC<Partial<ActionProps>> = (props) => StatusAction({
   text: 'BLESS',
@@ -243,7 +243,7 @@ export const PersistentAction: React.FC<Partial<ActionProps>> = (props) => Actio
 
 export const CardLostAction: React.FC<Partial<ActionProps>> = (props) => Action({
   className: 'action big-icon',
-  text: 'Card Lost',
+  text: 'Lost',
   action: 'card-lost',
   ...props,
   data: {
@@ -253,7 +253,7 @@ export const CardLostAction: React.FC<Partial<ActionProps>> = (props) => Action(
 })
 export const CardRecoverAction: React.FC<Partial<ActionProps>> = (props) => Action({
   className: 'action big-icon',
-  text: 'Card Recover',
+  text: 'Recover',
   action: 'card-recover',
   ...props,
   data: {
@@ -263,13 +263,78 @@ export const CardRecoverAction: React.FC<Partial<ActionProps>> = (props) => Acti
 })
 export const CardUnrecoverableAction: React.FC<Partial<ActionProps>> = (props) => Action({
   className: 'action big-icon',
-  text: 'Card Unrecoverable',
+  text: 'Unrecoverable',
   action: 'card-unrecoverable',
   ...props,
   data: {
     iconOnly: true,
     ...props.data,
   },
+})
+
+export const ItemHead: React.FC<Partial<ActionProps>> = (props) => Action({
+  text: 'Head',
+  action: 'item-head',
+  ...props,
+  data: {
+    iconOnly: true,
+    ...props.data,
+  },
+})
+export const ItemBody: React.FC<Partial<ActionProps>> = (props) => Action({
+  text: 'Body',
+  action: 'item-body',
+  ...props,
+  data: {
+    iconOnly: true,
+    ...props.data,
+  },
+})
+export const ItemFeet: React.FC<Partial<ActionProps>> = (props) => Action({
+  text: 'Feet',
+  action: 'item-feet',
+  ...props,
+  data: {
+    iconOnly: true,
+    ...props.data,
+  },
+})
+export const ItemOneHand: React.FC<Partial<ActionProps>> = (props) => Action({
+  text: 'One Hand',
+  action: 'item-onehand',
+  ...props,
+  data: {
+    iconOnly: true,
+    ...props.data,
+  },
+})
+export const ItemTwoHands: React.FC<Partial<ActionProps>> = (props) => Action({
+  text: 'Two Hands',
+  action: 'item-twohands',
+  ...props,
+  data: {
+    iconOnly: true,
+    ...props.data,
+  },
+})
+export const ItemSmall: React.FC<Partial<ActionProps>> = (props) => Action({
+  text: 'Small',
+  action: 'item-small',
+  ...props,
+  data: {
+    iconOnly: true,
+    ...props.data,
+  },
+})
+export const ItemRefresh: React.FC<Partial<ActionProps>> = (props) => Action({
+  text: 'Refresh',
+  action: 'item-refresh',
+  ...props,
+})
+export const ItemSpent: React.FC<Partial<ActionProps>> = (props) => Action({
+  text: 'Spent',
+  action: 'item-spent',
+  ...props,
 })
 
 export function renderActions(props: any, editor: any, next: () => any) {
@@ -355,6 +420,24 @@ export function renderActions(props: any, editor: any, next: () => any) {
       return <div className="inline-action" {...attributes}><CardRecoverAction {...childAttributes}/></div>
     case 'card-unrecoverable':
       return <div className="inline-action" {...attributes}><CardUnrecoverableAction {...childAttributes}/></div>
+
+    case 'item-head':
+      return <div className="inline-action" {...attributes}><ItemHead {...childAttributes}/></div>
+    case 'item-body':
+      return <div className="inline-action" {...attributes}><ItemBody {...childAttributes}/></div>
+    case 'item-feet':
+      return <div className="inline-action" {...attributes}><ItemFeet {...childAttributes}/></div>
+    case 'item-onehand':
+      return <div className="inline-action" {...attributes}><ItemOneHand {...childAttributes}/></div>
+    case 'item-twohands':
+      return <div className="inline-action" {...attributes}><ItemTwoHands {...childAttributes}/></div>
+    case 'item-small':
+      return <div className="inline-action" {...attributes}><ItemSmall {...childAttributes}/></div>
+
+    case 'item-refresh':
+      return <div className="inline-action" {...attributes}><ItemRefresh {...childAttributes}/></div>
+    case 'item-spent':
+      return <div className="inline-action" {...attributes}><ItemSpent {...childAttributes}/></div>
     default:
       return next()
   }

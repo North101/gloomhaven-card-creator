@@ -122,6 +122,16 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
         <ToolbarIcon action='card-lost' />
         <ToolbarIcon action='card-recover' />
         <ToolbarIcon action='card-unrecoverable' />
+
+        <ToolbarIcon action='item-head' />
+        <ToolbarIcon action='item-body' />
+        <ToolbarIcon action='item-feet' />
+        <ToolbarIcon action='item-onehand' />
+        <ToolbarIcon action='item-twohands' />
+        <ToolbarIcon action='item-small' />
+
+        <ToolbarIcon action='item-spent' />
+        <ToolbarIcon action='item-refresh' />
       </div>
     )
   }
