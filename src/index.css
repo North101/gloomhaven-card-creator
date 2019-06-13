@@ -22,6 +22,10 @@ body, #root {
   height: 100vh;
 }
 
+img {
+  display: block;
+}
+
 #card-container {
   display: flex;
   flex: 1;
@@ -205,7 +209,6 @@ body, #root {
 
 .action.element img {
   height: 1.3em;
-  padding: 0 5px;
   width: auto;
 }
 
@@ -222,13 +225,11 @@ body, #root {
 
 .action.status img {
   height: 1.3em;
-  padding: 0 5px;
   width: auto;
 }
 
 .action.big-icon img {
   height: 2.0em;
-  padding: 0 5px;
   width: auto;
 }
 
