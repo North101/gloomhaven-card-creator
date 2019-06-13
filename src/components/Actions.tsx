@@ -160,14 +160,29 @@ export const XPAction: React.FC<ActionProps> = (props) => {
   )
 }
 
-export const ElementAction: React.FC<ActionProps> = (props) => Action({
-  className: 'action element',
-  ...props,
-  data: {
-    iconOnly: true,
-    ...props.data,
-  },
-})
+export const ElementAction: React.FC<ActionProps> = (props) => {
+  props = {
+    className: 'action element',
+    ...props,
+    data: {
+      iconOnly: true,
+      ...props.data,
+    }
+  }
+
+  return (
+    <div className={props.className || 'action'}>
+      <span>{props.data && props.data.iconOnly ? '' : props.text}</span>
+      {props.children && <span>{props.children}</span>}
+      <div>
+        <img alt={props.text} src={props.icon || require(`../assets/${props.action}.png`)}/>
+        {props.data && props.data.consume &&
+          <img className='consume' alt='consume' src={props.icon || require(`../assets/consume-element.png`)}/>
+        }
+      </div>
+    </div>
+  )
+}
 
 export const AllElementAction: React.FC<Partial<ActionProps>> = (props) => ElementAction({
   text: 'All',

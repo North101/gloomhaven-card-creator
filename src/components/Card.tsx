@@ -90,7 +90,7 @@ export class Card extends React.Component<CardProps, CardState> {
     e.stopPropagation()
 
     const action = e.dataTransfer.getData('action')
-    if (typeof(action) !== 'string') return false
+    if (!action) return false
 
     const data = JSON.parse(e.dataTransfer.getData('data')) || {}
     const rect = e.target.getBoundingClientRect()

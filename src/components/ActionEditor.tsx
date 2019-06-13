@@ -1,7 +1,7 @@
 import React from 'react'
 
 import { Editor } from 'slate-react'
-import { Value } from 'slate'
+import { Value, Inline } from 'slate'
 
 import { renderActions } from './Actions'
 import { HoverMenu } from './HoverMenu'
@@ -145,7 +145,7 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
     event.stopPropagation()
 
     const action = event.dataTransfer.getData('action')
-    if (typeof(action) !== 'string') return next()
+    if (!action) return next()
 
     const data = JSON.parse(event.dataTransfer.getData('data')) || {}
     if (action === 'text') {
@@ -157,6 +157,24 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
         type: action,
       })
     }
+  }
+
+  onClick = (event: any, editor: any, next: any) => {
+    const node = editor.findNode(event.target)
+    if (!Inline.isInline(node) || !node.type.startsWith('element-')) return next()
+
+    const json = node.toJSON()
+    const jsonData = json.data || {}
+
+    editor.replaceNodeByKey(node.key, {
+      ...json,
+      data: {
+        ...jsonData,
+        consume: !jsonData.consume,
+      },
+    })
+
+    return next()
   }
 
   render() {
@@ -183,6 +201,7 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
           ref={this.ref}
           value={this.state.value}
           onKeyDown={this.onKeyDown}
+          onClick={this.onClick}
           onChange={this.onChange}
           onBlur={this.onBlur}
           onDrop={this.onDrop}

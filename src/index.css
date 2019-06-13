@@ -209,6 +209,17 @@ body, #root {
   width: auto;
 }
 
+.action.element > div {
+  position: relative;
+  cursor: pointer; 
+}
+
+.action.element img.consume {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
 .action.status img {
   height: 1.3em;
   padding: 0 5px;
@@ -293,7 +304,7 @@ body, #root {
 }
 
 .inline-action {
-  pointer-events: none;
+  margin: 0 2px;
   display: inline-flex;
 }
 
