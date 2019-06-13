@@ -97,22 +97,23 @@ export class Card extends React.Component<CardProps, CardState> {
     const x = e.clientX - rect.left
     const y = e.clientY - rect.top
     
-    if (action === 'hex-enemy') {
+    if (action === 'hex-enemy-horizontal' || action === 'hex-enemy-vertical') {
+      let orientation
+      if (action === 'hex-enemy-horizontal') {
+        orientation = 'horizontal'
+      } else {
+        orientation = 'vertical'
+      }
       this.setState({
         hexes: {
           ...this.state.hexes,
           [generateUUIDv4()]: {
-            hexes: [
-              {
-                row: 0,
-                column: 0,
-                type: 'enemy',
-              },
-            ],
+            hexes: [],
             width: 30,
             height: 35,
             x: x,
             y: y,
+            orientation: orientation,
           },
         },
       })

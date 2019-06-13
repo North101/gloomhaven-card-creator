@@ -181,7 +181,6 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
     const style: any = {}
     if (this.props.cursor === 'move') {
       style.cursor = 'move'
-      style.boxShadow = 'blue 0px 0px 0px 2px'
     }
     return (
       <div

@@ -72,7 +72,8 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
         <div className='material-icons md-light' style={{cursor: 'pointer'}} onClick={this.onMoveClick}>zoom_out_map</div>
         <div className='material-icons md-light' draggable onDragStart={this.onDragStart} onClick={this.onTextClick}>edit</div>
 
-        <ToolbarIcon action='hex-enemy' />
+        <ToolbarIcon action='hex-enemy-vertical' />
+        <ToolbarIcon action='hex-enemy-horizontal' />
         
         <ToolbarIcon action='attack' />
         <ToolbarIcon action='heal' />
