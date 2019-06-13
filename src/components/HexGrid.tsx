@@ -102,7 +102,7 @@ export class HexGrid extends React.Component<HexProps, HexState> {
         onMouseDown={this.onMouseDown}
       >
         {hexes.flatMap((hex) => {
-          if (this.props.cursor === 'move') {
+          if (this.props.cursor !== 'text') {
             return [
               hex
             ]

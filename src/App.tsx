@@ -49,7 +49,7 @@ class App extends React.Component<AppProps, AppState> {
 
   onPrintClick = () => {
     this.setState({
-      cursor: 'move',
+      cursor: null,
     }, () => {
       window.print()
     })
