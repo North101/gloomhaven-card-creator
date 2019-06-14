@@ -47,7 +47,7 @@ export const XPAction: React.FC<ActionProps> = (props) => {
   return (
     <div className={`action xp ${data.size}`}>
       <img alt='xp' src={require('../assets/xp.png')}/>
-      <span>{data.value}</span>
+      <span>{data.value || 0}</span>
       {children ? children : <span></span>}
     </div>
   )
@@ -56,7 +56,7 @@ export const XPAction: React.FC<ActionProps> = (props) => {
 export const CircleAction: React.FC<ActionProps> = (props) => {
   const { data, children, node } = props
   let icon
-  if (typeof(node.value) === 'number') {
+  if (typeof(data.value) === 'number') {
     icon = 'circle-xp'
   } else {
     icon = 'circle'

@@ -252,11 +252,16 @@ img {
   justify-content: center;
 }
 
+.action.circle {
+  font-family: PirataOne;
+}
+
 .action.xp img {
   height: 2.0em;
 }
 
 .action.circle span {
+  padding-right: 11%;
   position: absolute;
   color: black;
 

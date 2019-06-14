@@ -22,6 +22,9 @@ const SCHEMA = {
     xp: {
       isVoid: true,
     },
+    circle: {
+      isVoid: true,
+    }
   },
 }
 

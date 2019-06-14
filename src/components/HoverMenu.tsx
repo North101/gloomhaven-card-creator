@@ -42,12 +42,12 @@ export const Menu = React.forwardRef<React.Ref<any>, any>((props, ref) => (
 ))
 
 const FontSizeValueButton = ({ editor }) => {
-  const block = editor.value.anchorBlock
-  const blockData = (block && block.data) || new Map<string, any>()
+  const { value } = editor
+  const block = value.anchorBlock && (value.anchorBlock.toJSON() || {})
 
   return (
     <span style={{color: 'white', padding: '0 4px', textAlign: 'center', minWidth: '2ems'}}>
-      {blockData.get('fontSize') || 18}pt
+      {block ? block.data.fontSize : 18}pt
     </span>
   )
 }
@@ -167,7 +167,60 @@ const ConsumeButton = ({ editor }) => {
         })
       }}
     >
-      <img src={require('../assets/consume-element.png')} style={{width: '1em', height: 'auto'}}/>
+      <img alt='consume' src={require('../assets/consume-element.png')} style={{width: '1em', height: 'auto'}}/>
+    </Button>
+  )
+}
+
+const XPValueButton = ({ editor }) => {
+  const { value } = editor
+
+  const { document, selection } = value
+  const { focus } = selection
+  if (!selection.isCollapsed) return null
+
+  const node = focus.path && document.getParent(focus.path)
+  if (!Inline.isInline(node) || !['xp', 'circle'].includes(node.type)) return null
+
+  const inline = (node.toJSON() || {}) as any
+
+  return (
+    <span style={{color: 'white', padding: '0 4px', textAlign: 'center', minWidth: '2ems'}}>
+      {inline.data.value || 0}xp
+    </span>
+  )
+}
+
+const XPButton = ({ editor, type }) => {
+  const { value } = editor
+
+  const { document, selection } = value
+  const { focus } = selection
+  if (!selection.isCollapsed) return null
+
+  const node = focus.path && document.getParent(focus.path)
+  if (!Inline.isInline(node) || !['xp', 'circle'].includes(node.type)) return null
+
+  const inline = (node.toJSON() || {}) as any
+  const isActive = !inline.data.consume
+
+  return (
+    <Button
+      reversed
+      active={isActive}
+      onMouseDown={event => {
+        event.preventDefault()
+
+        editor.setInlines({
+          ...inline,
+          data: {
+            ...inline.data,
+            value: (inline.data.value || 0) + (type === 'add' ? 1 : -1),
+          }
+        })
+      }}
+    >
+      <Icon>{`${type}_circle`}</Icon>
     </Button>
   )
 }
@@ -190,6 +243,10 @@ export const HoverMenu = React.forwardRef<React.Ref<any>, {editor: Editor}>((pro
 
       <IconOnlyButton editor={props.editor} />
       <ConsumeButton editor={props.editor} />
+
+      <XPButton editor={props.editor} type='remove' />
+      <XPValueButton editor={props.editor} />
+      <XPButton editor={props.editor} type='add' />
     </Menu>,
     root
   )
