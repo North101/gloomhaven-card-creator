@@ -47,7 +47,7 @@ const FontSizeValueButton = ({ editor }) => {
 
   return (
     <span style={{color: 'white', padding: '0 4px', textAlign: 'center', minWidth: '2ems'}}>
-      {block ? block.data.fontSize : 18}pt
+      {block && block.data.fontSize ? block.data.fontSize : 18}pt
     </span>
   )
 }
