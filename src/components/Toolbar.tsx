@@ -86,10 +86,7 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
           <ToolbarIcon type='action' icon='shield' text='Shield' />
           <ToolbarIcon type='action' icon='retaliate' text='Retaliate' />
           <ToolbarIcon type='action' icon='loot' text='Loot' />
-          <ToolbarIcon type='xp' icon='xp' text='XP' nodes={[{
-            object: 'text',
-            text: '1',
-          }]} />
+          <ToolbarIcon type='xp' icon='xp' text='XP' />
           <ToolbarIcon type='action' icon='round' text='Round' iconOnly={true} />
           <ToolbarIcon type='action' icon='persistent' text='Persistent' iconOnly={true} />
 
@@ -131,6 +128,8 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
 
           <ToolbarIcon type='action' icon='item-spent' text='Spent' />
           <ToolbarIcon type='action' icon='item-refresh' text='Refresh' />
+
+          <ToolbarIcon type='circle' icon='circle' text='Circle' iconOnly={true} />
         </div>
       </div>
     )
@@ -138,7 +137,7 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
 }
 
 export interface ToolbarIconAction {
-  type: 'action' | 'element' | 'xp' | 'text'
+  type: 'action' | 'element' | 'xp' | 'circle' | 'text'
   nodes?: any
   icon: string
   iconOnly?: boolean

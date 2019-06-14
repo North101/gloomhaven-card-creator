@@ -11,6 +11,20 @@ const PLUGINS = [
   new ActionPlugin(),
 ] as any
 
+const SCHEMA = {
+  inlines: {
+    action: {
+      isVoid: true,
+    },
+    element: {
+      isVoid: true,
+    },
+    xp: {
+      isVoid: true,
+    },
+  },
+}
+
 
 export interface ActionContent {
   value: Value
@@ -58,7 +72,9 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
 
     const { selection } = this.state.value
     if (selection.isBlurred) {
-      menu.style.opacity = 0
+      menu.style.top = null
+      menu.style.left = null
+      menu.style.opacity = null
       return
     }
 
@@ -114,6 +130,7 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
         ref={this.containerRef}
       >
         <Editor
+          schema={SCHEMA}
           plugins={PLUGINS}
           autoFocus
           spellCheck={false}
@@ -124,7 +141,6 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
           onBlur={this.onBlur}
           renderEditor={this.renderEditor}
           renderMark={this.renderMark}
-          renderBlock={this.renderBlock}
         />
       </div>
     )
@@ -138,35 +154,6 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
         <HoverMenu ref={this.menuRef as any} editor={editor as any} />
       </React.Fragment>
     )
-  }
-
-  renderBlock = (props: any, editor: any, next: () => any) => {
-    const { attributes, children, node } = props
-
-    switch (node.type) {
-      case 'action-main': {
-        const { styles, ...attrs } = attributes
-        const fontSize = node.data.get('fontSize') || 18
-        const align = {
-          left: 'flex-start',
-          right: 'flex-end',
-        }[node.data.get('align')] || 'center'
-
-        return <div
-          className="action-main"
-          {...attrs}
-          style={{
-            ...(styles || {}),
-            fontSize: `${fontSize}pt`,
-            justifyContent: align
-          }}
-        >
-          {children}
-        </div>
-      }
-      default:
-        return next()
-    }
   }
 
   renderMark = (props: any, editor: any, next: () => any) => {

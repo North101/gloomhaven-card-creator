@@ -128,7 +128,7 @@ export class Card extends React.Component<CardProps, CardState> {
             }],
           },
         } as any)
-      } else if (type === 'action' || type === 'element' || type === 'xp') {
+      } else {
         value = Value.fromJSON({
           object: 'value',
           document: {
@@ -143,8 +143,6 @@ export class Card extends React.Component<CardProps, CardState> {
             }],
         },
         } as any)
-      } else {
-        return
       }
 
       this.setState({

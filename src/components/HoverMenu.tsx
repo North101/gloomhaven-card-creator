@@ -1,4 +1,5 @@
 import { Editor } from 'slate-react'
+import { Inline } from 'slate'
 
 import React from 'react'
 import ReactDOM from 'react-dom'
@@ -103,6 +104,74 @@ const AlignButton = ({ editor, align }) => {
   )
 }
 
+const IconOnlyButton = ({ editor }) => {
+  const { value } = editor
+
+  const { document, selection } = value
+  const { focus } = selection
+  if (!selection.isCollapsed) return null
+
+  const node = focus.path && document.getParent(focus.path)
+  if (!Inline.isInline(node) || !['action', 'element'].includes(node.type)) return null
+
+  const inline = (node.toJSON() || {}) as any
+  const isActive = !inline.data.iconOnly
+
+  return (
+    <Button
+      reversed
+      active={isActive}
+      onMouseDown={event => {
+        event.preventDefault()
+
+        editor.setInlines({
+          ...inline,
+          data: {
+            ...inline.data,
+            iconOnly: !inline.data.iconOnly,
+          }
+        })
+      }}
+    >
+      <Icon>title</Icon>
+    </Button>
+  )
+}
+
+const ConsumeButton = ({ editor }) => {
+  const { value } = editor
+
+  const { document, selection } = value
+  const { focus } = selection
+  if (!selection.isCollapsed) return null
+
+  const node = focus.path && document.getParent(focus.path)
+  if (!Inline.isInline(node) || !['element'].includes(node.type)) return null
+
+  const inline = (node.toJSON() || {}) as any
+  const isActive = !inline.data.consume
+
+  return (
+    <Button
+      reversed
+      active={isActive}
+      onMouseDown={event => {
+        event.preventDefault()
+
+        editor.setInlines({
+          ...inline,
+          data: {
+            ...inline.data,
+            consume: !inline.data.consume,
+          }
+        })
+      }}
+    >
+      <img src={require('../assets/consume-element.png')} style={{width: '1em', height: 'auto'}}/>
+    </Button>
+  )
+}
+
 export const HoverMenu = React.forwardRef<React.Ref<any>, {editor: Editor}>((props, ref) => {
   const root = window.document.getElementById('root')
   if (!root) return null
@@ -110,18 +179,7 @@ export const HoverMenu = React.forwardRef<React.Ref<any>, {editor: Editor}>((pro
   return ReactDOM.createPortal(
     <Menu
       ref={ref}
-      style={{
-        padding: '8px 7px 6px',
-        position: 'absolute',
-        zIndex: '1',
-        top: '-10000px',
-        left: '-10000px',
-        marginTop: '-6px',
-        opacity: '0',
-        backgroundColor: '#222',
-        borderRadius: '4px',
-        transition: 'opacity 0.75s',
-      }}
+      className='hover-menu'
     >
       <FontSizeButton editor={props.editor} type='remove' />
       <FontSizeValueButton editor={props.editor} />
@@ -129,6 +187,9 @@ export const HoverMenu = React.forwardRef<React.Ref<any>, {editor: Editor}>((pro
       <AlignButton editor={props.editor} align='left' />
       <AlignButton editor={props.editor} align='center' />
       <AlignButton editor={props.editor} align='right' />
+
+      <IconOnlyButton editor={props.editor} />
+      <ConsumeButton editor={props.editor} />
     </Menu>,
     root
   )

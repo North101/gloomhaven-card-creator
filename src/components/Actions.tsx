@@ -1,7 +1,5 @@
 import React from 'react'
 
-import { Inline } from 'slate'
-
 
 export interface ActionProps {
   data: {
@@ -10,6 +8,7 @@ export interface ActionProps {
     iconOnly?: boolean
     [key: string]: any
   }
+  node: any
   children?: any
 }
 
@@ -19,7 +18,7 @@ export const Action: React.FC<ActionProps> = (props) => {
   return (
     <div className='action'>
       <span>{data.iconOnly ? '' : data.text}</span>
-      {children && <span>{children}</span>}
+      {children ? children : <span></span>}
       <img alt={data.text} src={require(`../assets/${data.icon}.png`)}/>
     </div>
   )
@@ -31,7 +30,7 @@ export const ElementAction: React.FC<ActionProps> = (props) => {
   return (
     <div className='action element'>
       <span>{data.iconOnly ? '' : data.text}</span>
-      {children && <span>{children}</span>}
+      {children ? children : <span></span>}
       <div>
         <img alt={data.text} src={require(`../assets/${data.icon}.png`)}/>
         {data.consume &&
@@ -48,126 +47,86 @@ export const XPAction: React.FC<ActionProps> = (props) => {
   return (
     <div className={`action xp ${data.size}`}>
       <img alt='xp' src={require('../assets/xp.png')}/>
-      <span>{children}</span>
+      <span>{data.value}</span>
+      {children ? children : <span></span>}
+    </div>
+  )
+}
+
+export const CircleAction: React.FC<ActionProps> = (props) => {
+  const { data, children, node } = props
+  let icon
+  if (typeof(node.value) === 'number') {
+    icon = 'circle-xp'
+  } else {
+    icon = 'circle'
+  }
+
+  return (
+    <div className='action circle'>
+      <img alt='circle' src={require(`../assets/${icon}.png`)}/>
+      <span>{data.value}</span>
+      {children ? children : <span></span>}
     </div>
   )
 }
 
 export class ActionPlugin {
-  renderInline = (props: any, editor: any, next: () => any) => {
+  renderBlock = (props: any, editor: any, next: () => any) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
-      case 'action':
-        return <div className="inline-action" {...attributes}>
-          <Action data={Object.fromEntries(node.data) as any}>
-            {children}
-          </Action>
+      case 'action-main': {
+        const { styles, ...attrs } = attributes
+        const fontSize = node.data.get('fontSize') || 18
+        const align = {
+          left: 'flex-start',
+          right: 'flex-end',
+        }[node.data.get('align')] || 'center'
+
+        return <div
+          className="action-main"
+          {...attrs}
+          style={{
+            ...(styles || {}),
+            fontSize: `${fontSize}pt`,
+            justifyContent: align,
+          }}
+        >
+          {children}
         </div>
-      case 'element':
-        return <div className="inline-action" {...attributes}>
-          <ElementAction data={Object.fromEntries(node.data) as any}>
-            {children}
-          </ElementAction>
-        </div>
-      case 'xp':
-        return <div className="inline-action" {...attributes}>
-          <XPAction data={Object.fromEntries(node.data) as any}>
-            {children}
-          </XPAction>
-        </div>
+      }
       default:
         return next()
     }
   }
 
-  onKeyDown = (event: any, editor: any, next: () => any) => {
-    if (event.keyCode === 37) {
-      const { document, selection } = editor.value
-      const { start } = selection
+  renderInline = (props: any, editor: any, next: () => any) => {
+    const { attributes, children, node, isFocused } = props
 
-      if (start.offset !== 0) return next()
-      
-      let node = document.getPreviousNode(start.key)
-      if (!Inline.isInline(node) || (node.type !== 'action' && node.type !== 'element')) return next()
-
-      let text = document.getPreviousText(node.key)
-      while (text && node.hasDescendant(text.key)) {
-        text = document.getPreviousText(text.key)
-      }
-      if (!text) return next()
-
-      event.preventDefault()
-      event.stopPropagation()
-      editor.moveToEndOfNode(text).focus()
-    } else if (event.keyCode === 37) {
-      const { document, selection } = editor.value
-      const { start } = selection
-      
-      let node = document.getNextNode(start.key)
-      if (!Inline.isInline(node) || (node.type !== 'action' && node.type !== 'element')) return next()
-      
-      event.preventDefault()
-      event.stopPropagation()
-
-      let text = document.getNextText(node.key)
-      while (text && node.hasDescendant(text.key)) {
-        text = document.getNextText(text.key)
-      }
-      if (!text) return next()
-
-      event.preventDefault()
-      event.stopPropagation()
-      editor.moveToStartOfNode(text).focus()
-    }
-    return next()
-  }
-
-  onClick = (event: any, editor: any, next: () => any) => {
-    const node = editor.findNode(event.target)
-    if (Inline.isInline(node) && node.type === 'action') {
-      event.preventDefault()
-      event.stopPropagation()
-
-      const { document } = editor.value
-
-      const target = editor.findDOMNode(editor.value.document.getPath(node.key))
-      const rect = target.getBoundingClientRect()
-      const x = event.clientX - rect.left
-      const width = target.clientWidth
-      if (x > (width / 2)) {
-        let text = document.getNextText(node.key)
-        while (text && node.hasDescendant(text.key)) {
-          text = document.getNextText(text.key)
-        }
-        if (text) {
-          editor.moveToStartOfNode(text).focus()
-        }
-      } else {
-        let text = document.getPreviousText(node.key)
-        while (text && node.hasDescendant(text.key)) {
-          text = document.getPreviousText(text.key)
-        }
-        if (text) {
-          editor.moveToEndOfNode(text).focus()
-        }
-      }
-    } else if (Inline.isInline(node) && node.type === 'element') {
-      event.preventDefault()
-      event.stopPropagation()
-
-      const inline = node.toJSON()
-      const data = inline.data || {}
-
-      editor.replaceNodeByKey(node.key, {
-        ...inline,
-        data: {
-          ...data,
-          consume: !data.consume,
-        },
-      })
-    } else {
-      return next()
+    switch (node.type) {
+      case 'action':
+        return <div contentEditable={false} className={`inline-action ${isFocused ? 'focused' : ''}`} {...attributes}>
+          <Action node={node} data={Object.fromEntries(node.data) as any}/>
+        </div>
+      case 'element':
+        return <div contentEditable={false} className={`inline-action ${isFocused ? 'focused' : ''}`} {...attributes}>
+          <ElementAction node={node} data={Object.fromEntries(node.data) as any}/>
+        </div>
+      case 'xp':
+        return <div contentEditable={false} className={`inline-action ${isFocused ? 'focused' : ''}`} {...attributes}>
+          <XPAction node={node} data={Object.fromEntries(node.data) as any}>
+            {children}
+          </XPAction>
+        </div>
+      case 'circle':
+        return <div contentEditable={false} className={`inline-action ${isFocused ? 'focused' : ''}`} {...attributes}>
+          <CircleAction node={node} data={Object.fromEntries(node.data) as any}>
+            {children}
+          </CircleAction>
+        </div>
+      default:
+        return next()
     }
   }
 

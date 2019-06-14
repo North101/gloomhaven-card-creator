@@ -194,7 +194,7 @@ img {
 
 .action {
   position: relative;
-  display: inline-flex;
+  display: flex;
   justify-content: center;
   align-items: center;
 }
@@ -256,6 +256,20 @@ img {
   height: 2.0em;
 }
 
+.action.circle span {
+  position: absolute;
+  color: black;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.action.circle img {
+  height: 3.5em;
+  width: auto;
+}
+
 [draggable=true] {
   cursor: move;
 }
@@ -307,6 +321,25 @@ img {
 .toolbar > div > input {
    width: 25px;
    height: 25px;
+}
+
+.inline-action.focused {
+  outline: 2px solid blue;
+}
+
+.hover-menu {
+  padding: 8px 7px 6px;
+  position: absolute;
+  z-index: 1;
+  top: -10000px;
+  left: -10000px;
+  margin-top: -6px;
+  opacity: 0;
+  background-color: #222;
+  border-radius: 4px;
+  transition: opacity 0.75s;
+  display: flex;
+  align-items: center;
 }
 
 [data-slate-object=text] {
