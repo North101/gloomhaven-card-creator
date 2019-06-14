@@ -4,7 +4,7 @@ import React from 'react'
 export interface Hex {
   row: number
   column: number
-  type: 'enemy' | 'player' | 'hidden'
+  type: 'add' | 'enemy' | 'player' | 'enhancement'
 }
 
 export interface HexProps {
@@ -32,9 +32,10 @@ export interface HexState {
 
 export class HexGrid extends React.Component<HexProps, HexState> {
   types = {
-    'hidden': 0,
+    'add': 0,
     'enemy': 1,
     'player': 2,
+    'enhancement': 3,
   }
 
   constructor(props: HexProps) {
@@ -58,17 +59,17 @@ export class HexGrid extends React.Component<HexProps, HexState> {
         {
           row: hex.row - 1,
           column: hex.column + columnOffset,
-          type: 'hidden',
+          type: 'add',
         },
         {
           row: hex.row - 1,
           column: hex.column + 1 + columnOffset,
-          type: 'hidden',
+          type: 'add',
         },
         {
           row: hex.row,
           column: hex.column + 1,
-          type: 'hidden',
+          type: 'add',
         },
         {
           row: hex.row,
@@ -78,17 +79,17 @@ export class HexGrid extends React.Component<HexProps, HexState> {
         {
           row: hex.row,
           column: hex.column - 1,
-          type: 'hidden',
+          type: 'add',
         },
         {
           row: hex.row + 1,
           column: hex.column + columnOffset,
-          type: 'hidden',
+          type: 'add',
         },
         {
           row: hex.row + 1,
           column: hex.column + 1 + columnOffset,
-          type: 'hidden',
+          type: 'add',
         },
       ] as Hex[]
     }).filter((hex, index, array) => {
@@ -109,7 +110,7 @@ export class HexGrid extends React.Component<HexProps, HexState> {
         {
           row: 0,
           column: 0,
-          type: 'hidden',
+          type: 'add',
         },
       ]
     }
@@ -124,10 +125,12 @@ export class HexGrid extends React.Component<HexProps, HexState> {
     e.stopPropagation()
 
     let newType
-    if (hex.type === 'hidden') {
+    if (hex.type === 'add') {
       newType = 'enemy'
     } else if (hex.type === 'enemy') {
       newType = 'player'
+    } else if (hex.type === 'player') {
+      newType = 'enhancement'
     } else {
       newType = null
     }
@@ -176,7 +179,7 @@ export class HexGrid extends React.Component<HexProps, HexState> {
         onMouseDown={this.onMouseDown}
       >
         {cachedHexes && cachedHexes.filter(hex => {
-          return (cursor === 'text') || hex.type !== 'hidden'
+          return (cursor === 'text') || hex.type !== 'add'
         }).map((hex, index) => {
           const columnOffset = Math.abs(hex.row % 2) === 1 ? width / 2 : 0
           const rowPos = `${(hex.row * height * 3 / 4)}px`

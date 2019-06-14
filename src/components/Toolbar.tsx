@@ -130,6 +130,8 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
           <ToolbarIcon type='action' icon='item-refresh' text='Refresh' />
 
           <ToolbarIcon type='circle' icon='circle' text='Circle' iconOnly={true} />
+
+          <ToolbarIcon type='action' icon='enhancement' text='Enhancement' iconOnly={true} />
         </div>
       </div>
     )

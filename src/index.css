@@ -347,6 +347,11 @@ img {
   align-items: center;
 }
 
+.hover-menu .consume {
+  height: 1em;
+  width: auto;
+}
+
 [data-slate-object=text] {
   min-width: 1px;
 }

@@ -167,7 +167,7 @@ const ConsumeButton = ({ editor }) => {
         })
       }}
     >
-      <img alt='consume' src={require('../assets/consume-element.png')} style={{width: '1em', height: 'auto'}}/>
+      <img alt='consume' src={require('../assets/consume-element.png')} className='consume'/>
     </Button>
   )
 }
