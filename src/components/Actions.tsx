@@ -1,39 +1,48 @@
 import React from 'react'
 
+import classNames from 'classnames'
+
+import {
+  Editor as CoreEditor,
+  Plugin,
+  Inline,
+} from 'slate'
+
+import {
+  RenderBlockProps,
+  RenderInlineProps,
+} from 'slate-react'
+
 
 export interface ActionProps {
-  data: {
-    text: string
-    icon: any
-    iconOnly?: boolean
-    [key: string]: any
-  }
-  node: any
+  node: Inline
   children?: any
 }
 
 export const Action: React.FC<ActionProps> = (props) => {
-  const { data, children } = props
+  const { node, children } = props
+  const { data } = node
 
   return (
     <div className='action'>
-      <span>{data.iconOnly ? '' : data.text}</span>
+      <span>{data.get('iconOnly') ? '' : data.get('text')}</span>
       {children ? children : <span></span>}
-      <img alt={data.text} src={require(`../assets/${data.icon}.png`)}/>
+      <img alt={data.get('text')} src={require(`../assets/${data.get('icon')}.png`)}/>
     </div>
   )
 }
 
 export const ElementAction: React.FC<ActionProps> = (props) => {
-  const { data, children } = props
+  const { node, children } = props
+  const { data } = node
 
   return (
     <div className='action element'>
-      <span>{data.iconOnly ? '' : data.text}</span>
+      <span>{data.get('iconOnly') ? '' : data.get('text')}</span>
       {children ? children : <span></span>}
       <div>
-        <img alt={data.text} src={require(`../assets/${data.icon}.png`)}/>
-        {data.consume &&
+        <img alt={data.get('text')} src={require(`../assets/${data.get('icon')}.png`)}/>
+        {data.get('consume') &&
           <img className='consume' alt='consume' src={require(`../assets/consume-element.png`)}/>
         }
       </div>
@@ -42,55 +51,53 @@ export const ElementAction: React.FC<ActionProps> = (props) => {
 }
 
 export const XPAction: React.FC<ActionProps> = (props) => {
-  const { data, children } = props
+  const { node, children } = props
+  const { data } = node
 
   return (
     <div className={`action xp ${data.size}`}>
       <img alt='xp' src={require('../assets/xp.png')}/>
-      <span>{data.value || 0}</span>
+      <span>{data.get('value') || 0}</span>
       {children ? children : <span></span>}
     </div>
   )
 }
 
 export const CircleAction: React.FC<ActionProps> = (props) => {
-  const { data, children } = props
-  let icon
-  if (data.value) {
-    icon = 'circle-xp'
-  } else {
-    icon = 'circle'
-  }
+  const { node, children } = props
+  const { data } = node
+  const value = data.get('value')
+  const icon = value ? 'circle-xp' : 'circle'
 
   return (
     <div className='action circle'>
       <img alt='circle' src={require(`../assets/${icon}.png`)}/>
-      <span>{data.value ? data.value : ''}</span>
+      <span>{value ? value : ''}</span>
       {children ? children : <span></span>}
     </div>
   )
 }
 
-export class ActionPlugin {
-  renderBlock = (props: any, editor: any, next: () => any) => {
+export class ActionPlugin implements Plugin {
+  renderBlock = (props: RenderBlockProps, editor: CoreEditor, next: () => any) => {
     const { attributes, children, node } = props
 
     switch (node.type) {
       case 'action-main': {
-        const { styles, ...attrs } = attributes
+        const { className, styles, ...attrs } = attributes
         const fontSize = node.data.get('fontSize') || 18
-        const align = {
-          left: 'flex-start',
-          right: 'flex-end',
-        }[node.data.get('align')] || 'center'
+        const align = node.data.get('align') || 'center'
 
         return <div
-          className="action-main"
           {...attrs}
+          className={classNames({
+            "action-main": true,
+            [align]: true,
+            ...(className || {}),
+          })}
           style={{
             ...(styles || {}),
             fontSize: `${fontSize}pt`,
-            justifyContent: align,
           }}
         >
           {children}
@@ -101,27 +108,27 @@ export class ActionPlugin {
     }
   }
 
-  renderInline = (props: any, editor: any, next: () => any) => {
+  renderInline = (props: RenderInlineProps, editor: CoreEditor, next: () => any) => {
     const { attributes, children, node, isFocused } = props
 
     switch (node.type) {
       case 'action':
         return <div contentEditable={false} className={`inline-action ${isFocused ? 'focused' : ''}`} {...attributes}>
-          <Action node={node} data={Object.fromEntries(node.data) as any}/>
+          <Action node={node}/>
         </div>
       case 'element':
         return <div contentEditable={false} className={`inline-action ${isFocused ? 'focused' : ''}`} {...attributes}>
-          <ElementAction node={node} data={Object.fromEntries(node.data) as any}/>
+          <ElementAction node={node}/>
         </div>
       case 'xp':
         return <div contentEditable={false} className={`inline-action ${isFocused ? 'focused' : ''}`} {...attributes}>
-          <XPAction node={node} data={Object.fromEntries(node.data) as any}>
+          <XPAction node={node}>
             {children}
           </XPAction>
         </div>
       case 'circle':
         return <div contentEditable={false} className={`inline-action ${isFocused ? 'focused' : ''}`} {...attributes}>
-          <CircleAction node={node} data={Object.fromEntries(node.data) as any}>
+          <CircleAction node={node}>
             {children}
           </CircleAction>
         </div>
@@ -130,20 +137,23 @@ export class ActionPlugin {
     }
   }
 
-  onDragOver = (event: any, editor: any, next: () => any) => {
+  onDragOver = (event: any, editor: CoreEditor, next: () => any) => {
     event.preventDefault()
     event.stopPropagation()
   }
 
-  onDrop = (event: any, editor: any, next: () => any) => {
+  onDrop = (event: any, editor: CoreEditor, next: () => any) => {
     event.preventDefault()
     event.stopPropagation()
 
-    const type = event.dataTransfer.getData('type')
+    const { dataTransfer } = event
+    if (!dataTransfer) return
+
+    const type = dataTransfer.getData('type')
     if (!type) return next()
 
-    const data = JSON.parse(event.dataTransfer.getData('extra')) || {}
-    if (type === 'text') {
+    const data = JSON.parse(dataTransfer.getData('extra')) || {}
+    if (type === 'edit') {
       editor.insertText('')
     } else if (type !== 'hex') {
       editor.insertInline({
@@ -153,14 +163,20 @@ export class ActionPlugin {
     }
   }
 
-  onChange = (editor: any, next: () => any) => {
+  onChange = (editor: CoreEditor, next: () => any) => {
     const { value } = editor
+    if (!value) return
+
     const xpActions = value.document.getInlinesByType('xp')
-    const isSmall = value.document.getBlocks().some((value) => {
-      return value.nodes.some((v1) => {
-        if (v1.object === 'inline' && v1.type === 'xp')
+    const isSmall = value.document.getBlocks().some(block => {
+      if (!block) return false
+
+      return block.nodes.some((node) => {
+        if (!node)
+          return true
+        else if (node.object === 'inline' && node.type === 'xp')
           return false
-        else if (v1.object === 'text' && v1.text === '')
+        else if (node.object === 'text' && node.text === '')
           return false
         else
           return true
@@ -174,11 +190,13 @@ export class ActionPlugin {
        size = 'small'
     }
     xpActions.forEach((action) => {
-      const value = action.toJSON()
-      value.data = value.data || {}
-      if (value.data.size !== size) {
-        value.data.size = size
-        editor.replaceNodeByKey(action.key, value)
+      if (!action) return
+
+      const actionJSON = action.toJSON()
+      actionJSON.data = actionJSON.data || {}
+      if (actionJSON.data.size !== size) {
+        actionJSON.data.size = size
+        editor.replaceNodeByKey(action.key, Inline.fromJSON(actionJSON))
       }
     })
 

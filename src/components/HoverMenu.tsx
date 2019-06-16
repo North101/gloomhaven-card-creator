@@ -1,44 +1,42 @@
-import { Editor } from 'slate-react'
-import { Inline } from 'slate'
-
 import React from 'react'
 import ReactDOM from 'react-dom'
 
+import {
+  Editor as CoreEditor,
+  Inline,
+} from 'slate'
 
-export const Button = React.forwardRef<React.Ref<any>, any>(({ style, active, reversed, ...props }, ref) => (
-    <span
-      {...props}
-      ref={ref}
-      style={{
-        ...style,
-        cursor: 'pointer',
-        color: `${reversed ? active ? 'white' : '#aaa' : active ? 'black' : '#ccc'}`,
-      }}
-    />
-  )
-)
+import classNames from "classnames"
 
-export const Icon = React.forwardRef<React.Ref<any>, any>(({ className, style, ...props }, ref) => (
+
+export const Button = React.forwardRef<React.Ref<any>, any>(({ className, active, reversed, ...props }, ref) => (
   <span
     {...props}
     ref={ref}
-    className={[
-      ...(className || '').split(' '),
-      'material-icons',
-    ].join(' ')}
-    style={{
-      ...style,
-      fontSize: '18px',
-      verticalAlign: 'text-bottom',
-    }}
+    className={classNames({
+      'material-icons': true,
+      'button': true,
+      'active': active,
+      'reversed': reversed,
+      ...(className || {}),
+    })}
+  />
+))
+
+export const Icon = React.forwardRef<React.Ref<any>, any>(({ className, ...props }, ref) => (
+  <span
+    {...props}
+    ref={ref}
+    className={classNames({
+      'material-icons': true,
+      'icon': true,
+      ...(className || {}),
+    })}
   />
 ))
 
 export const Menu = React.forwardRef<React.Ref<any>, any>((props, ref) => (
-  <div
-    {...props}
-    ref={ref}
-  />
+  <div {...props} ref={ref} />
 ))
 
 const FontSizeValueButton = ({ editor }) => {
@@ -46,7 +44,7 @@ const FontSizeValueButton = ({ editor }) => {
   const block = value.anchorBlock && (value.anchorBlock.toJSON() || {})
 
   return (
-    <span style={{color: 'white', padding: '0 4px', textAlign: 'center', minWidth: '2ems'}}>
+    <span className="font-size">
       {block && block.data.fontSize ? block.data.fontSize : 18}pt
     </span>
   )
@@ -185,7 +183,7 @@ const XPValueButton = ({ editor }) => {
   const inline = (node.toJSON() || {}) as any
 
   return (
-    <span style={{color: 'white', padding: '0 4px', textAlign: 'center', minWidth: '2ems'}}>
+    <span className='xp-value'>
       {inline.data.value || 0}xp
     </span>
   )
@@ -225,15 +223,16 @@ const XPButton = ({ editor, type }) => {
   )
 }
 
-export const HoverMenu = React.forwardRef<React.Ref<any>, {editor: Editor}>((props, ref) => {
+interface HoverMenuProps {
+  editor: CoreEditor
+}
+
+export const HoverMenu = React.forwardRef<React.Ref<HTMLDivElement>, HoverMenuProps>((props, ref) => {
   const root = window.document.getElementById('root')
   if (!root) return null
 
   return ReactDOM.createPortal(
-    <Menu
-      ref={ref}
-      className='hover-menu'
-    >
+    <Menu ref={ref} className='hover-menu'>
       <FontSizeButton editor={props.editor} type='remove' />
       <FontSizeValueButton editor={props.editor} />
       <FontSizeButton editor={props.editor} type='add' />

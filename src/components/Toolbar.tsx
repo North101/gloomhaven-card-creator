@@ -6,8 +6,9 @@ import { throttle } from 'throttle-debounce'
 export interface ToolbarProps {
   color: string
   onColorChange: (color: string) => void
-  onCursorChange: (cursor: 'move' | 'text' | null) => void
+  onCursorChange: (cursor: 'move' | 'edit') => void
   onPrintClick: () => void
+  onDeleteClick: () => void
 }
 
 export interface ToolbarState {
@@ -19,22 +20,22 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
     super(props)
 
     this.state = {
-      color: this.props.color,
+      color: props.color,
     }
   }
-
   onColorChange = (e: any) => {
+    const { value } = e.target
     this.setState({
-      color: e.target.value,
+      color: value,
     })
-    this.onThrottledColorChange(e.target.value)
+    this.onThrottledColorChange(value)
   }
 
   onThrottledColorChange = throttle(500, (color: string) => {
     this.props.onColorChange(color)
   })
 
-  onCursorChange = (e: any, cursor: 'move' | 'text' | null) => {
+  onCursorChange = (e: any, cursor: 'move' | 'edit') => {
     e.preventDefault()
     e.stopPropagation()
 
@@ -59,20 +60,25 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
   }
 
   onTextClick = (e: any) => {
-    this.onCursorChange(e, 'text')
+    this.onCursorChange(e, 'edit')
+  }
+
+  onDeleteClick = (e: any) => {
+    this.props.onDeleteClick()
   }
 
   render() {
     return (
       <div className='toolbar-container'>
-        <div className='toolbar' style={{minWidth: 'fit-content'}}>
+        <div className='toolbar main'>
           <div><input type='color' value={this.state.color} onChange={this.onColorChange}/></div>
           
-          <div className='material-icons md-light' style={{cursor: 'pointer'}} onClick={this.onPrintClick}>print</div>
-          <div className='material-icons md-light' style={{cursor: 'pointer'}} onClick={this.onMoveClick}>zoom_out_map</div>
-          <div className='material-icons md-light' draggable onDragStart={this.onDragStart} onClick={this.onTextClick}>edit</div>
+          <div className='material-icons md-light click' onClick={this.onPrintClick}>print</div>
+          <div className='material-icons md-light click' onClick={this.onMoveClick}>zoom_out_map</div>
         </div>
         <div className='toolbar'>
+          <div className='material-icons md-light' draggable onDragStart={this.onDragStart} onClick={this.onTextClick}>edit</div>
+
           <ToolbarIcon type='hex' icon='hex-enemy-vertical' orientation='vertical' />
           <ToolbarIcon type='hex' icon='hex-enemy-horizontal' orientation='horizontal' />
           
@@ -133,18 +139,20 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
 
           <ToolbarIcon type='action' icon='enhancement' text='Enhancement' iconOnly={true} />
         </div>
+        <div className='toolbar main'>
+          <div className='material-icons md-light click' onClick={this.onDeleteClick}>delete</div>
+        </div>
       </div>
     )
   }
 }
 
 export interface ToolbarIconAction {
-  type: 'action' | 'element' | 'xp' | 'circle' | 'text'
+  type: 'action' | 'element' | 'xp' | 'circle' | 'edit'
   nodes?: any
   icon: string
   iconOnly?: boolean
   text: string
-  data?: object
 }
 
 export interface ToolbarIconHex {

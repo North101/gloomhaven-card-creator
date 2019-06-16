@@ -1,40 +1,33 @@
 import React from 'react'
 
-import { Editor } from 'slate-react'
-import { Value } from 'slate'
-import Plain from 'slate-plain-serializer'
+import {
+  Editor as CoreEditor, 
+  Value,
+} from 'slate'
+import {
+  Editor,
+  RenderBlockProps,
+} from 'slate-react'
 
+import classNames from 'classnames'
+import deepEquals from 'fast-deep-equal'
 import { generateUUIDv4 } from '@bitjourney/uuid-v4'
 
-import { ActionEditor, ActionContent } from './ActionEditor'
+import { CardData, ActionData, HexData } from './Data'
+import { ActionEditor } from './ActionEditor'
 import { Summon } from './Summon'
-import { HexGrid, HexState } from './HexGrid'
-
-
-interface CardData {
-  actions: {
-    [key: string]: ActionContent,
-  }
-  hexes: {
-    [key: string]: HexState,
-  }
-  title: Value
-  level: Value
-  initiative: Value
-  summonTop: boolean
-  summonBottom: boolean
-}
+import { HexGrid } from './HexGrid'
 
 
 export interface CardProps {
-  color: string
-  data?: CardData
-  cursor: 'move' | 'text' | null
+  cursor: 'move' | 'edit'
   onDataChange: (data: CardData) => void
-  onCursorChange: (cursor: 'move' | 'text' | null) => void
+  onCursorChange: (cursor: 'move' | 'edit') => void
+
+  data: CardData
 }
 
-export interface CardState extends CardData {
+export interface CardState {
   mouse?: {
     type: 'action' | 'hex'
     key: string
@@ -44,40 +37,12 @@ export interface CardState extends CardData {
 }
 
 export class Card extends React.Component<CardProps, CardState> {
-  editor?: Editor
+  titleEditor?: Editor
 
   constructor(props: CardProps) {
     super(props)
 
-    this.state = {
-      actions: {},
-      hexes: {},
-      title: Value.fromJSON({
-        object: 'value',
-        document: {
-          object: 'document',
-          nodes: [{
-            object: 'block',
-            type: 'action-main',
-            nodes: [{
-              object: 'text',
-              text: 'Card Name',
-              marks: [{
-                type: 'card-title',
-                data: {
-                  color: props.color
-                },
-              }],
-            }],
-          }],
-        },
-      } as any),
-      level: Plain.deserialize('1'),
-      initiative: Plain.deserialize('00'),
-      summonTop: false,
-      summonBottom: false,
-      ...(props.data || {}),
-    }
+    this.state = {}
   }
 
   onDragOver = (e: any) => {
@@ -98,9 +63,10 @@ export class Card extends React.Component<CardProps, CardState> {
     const y = e.clientY - rect.top
     
     if (type === 'hex') {
-      this.setState({
+      this.props.onDataChange({
+        ...this.props.data,
         hexes: {
-          ...this.state.hexes,
+          ...this.props.data.hexes,
           [generateUUIDv4()]: {
             hexes: [],
             width: 30,
@@ -145,9 +111,10 @@ export class Card extends React.Component<CardProps, CardState> {
         } as any)
       }
 
-      this.setState({
+      this.props.onDataChange({
+        ...this.props.data,
         actions: {
-          ...this.state.actions,
+          ...this.props.data.actions,
           [generateUUIDv4()]: {
             value: value,
             x: x,
@@ -156,35 +123,47 @@ export class Card extends React.Component<CardProps, CardState> {
         },
       })
     }
-
-    this.props.onCursorChange('text')
   }
 
   onTitleChange = ({value}) => {
-    this.setState({
+    this.props.onDataChange({
+      ...this.props.data,
       title: value,
     })
   }
 
   onLevelChange = ({value}) => {
-    this.setState({
+    this.props.onDataChange({
+      ...this.props.data,
       level: value,
     })
   }
 
   onInitiativeChange = ({value}) => {
-    this.setState({
+    this.props.onDataChange({
+      ...this.props.data,
       initiative: value,
+    })
+  }
+
+  onSummonChange = (key, data) => {
+    this.props.onDataChange({
+      ...this.props.data,
+      summon: {
+        ...this.props.data.summon,
+        [key]: data,
+      },
     })
   }
 
   deleteAction = (key: string) => {
     const actions = {
-      ...this.state.actions,
+      ...this.props.data.actions,
     }
     delete actions[key]
 
-    this.setState({
+    this.props.onDataChange({
+      ...this.props.data,
       actions: {
         ...actions
       },
@@ -202,13 +181,24 @@ export class Card extends React.Component<CardProps, CardState> {
     })
   }
 
+  onActionChange = (key: string, data: ActionData) => {
+    this.props.onDataChange({
+      ...this.props.data,
+      actions: {
+        ...this.props.data.actions,
+        [key]: data,
+      }
+    })
+  }
+
   deleteHex = (key: string) => {
     const hexes = {
-      ...this.state.hexes,
+      ...this.props.data.hexes,
     }
     delete hexes[key]
 
-    this.setState({
+    this.props.onDataChange({
+      ...this.props.data,
       hexes: {
         ...hexes
       },
@@ -226,6 +216,16 @@ export class Card extends React.Component<CardProps, CardState> {
     })
   }
 
+  onHexChange = (key: string, data: HexData) => {
+    this.props.onDataChange({
+      ...this.props.data,
+      hexes: {
+        ...this.props.data.hexes,
+        [key]: data,
+      }
+    })
+  }
+
   onMouseMove = (e: any) => {
     if (this.props.cursor !== 'move' || !this.state.mouse) return
 
@@ -234,8 +234,9 @@ export class Card extends React.Component<CardProps, CardState> {
 
     const mouse = this.state.mouse
     if (mouse.type === 'action') {
-      const { actions } = this.state
-      this.setState({
+      const actions = this.props.data.actions || {}
+      this.props.onDataChange({
+        ...this.props.data,
         actions: {
           ...actions,
           [mouse.key]: {
@@ -246,8 +247,9 @@ export class Card extends React.Component<CardProps, CardState> {
         },
       })
     } else if (mouse.type === 'hex') {
-      const { hexes } = this.state
-      this.setState({
+      const hexes = this.props.data.hexes || {}
+      this.props.onDataChange({
+        ...this.props.data,
         hexes: {
           ...hexes,
           [mouse.key]: {
@@ -271,62 +273,107 @@ export class Card extends React.Component<CardProps, CardState> {
     })
   }
 
-  onToggleSummonTop = (e: any) => {
-    this.setState({
-      summonTop: !this.state.summonTop,
+  onClickSummonTop = (e: any) => {
+    const { summon } = this.props.data
+    const { top } = summon
+
+    this.props.onDataChange({
+      ...this.props.data,
+      summon: {
+        ...summon,
+        top: {
+          ...top,
+          visible: !top.visible,
+        },
+      },
     })
   }
 
-  onToggleSummonBottom = (e: any) => {
-    this.setState({
-      summonBottom: !this.state.summonBottom,
+  onClickSummonBottom = (e: any) => {
+    const { summon } = this.props.data
+    const { bottom } = summon
+
+    this.props.onDataChange({
+      ...this.props.data,
+      summon: {
+        ...summon,
+        bottom: {
+          ...bottom,
+          visible: !bottom.visible,
+        },
+      },
     })
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !deepEquals(this.props, nextProps) || !deepEquals(this.state, nextState)
+  }
+
+  componentDidMount() {
+    this.updateTitleColor()
   }
 
   componentDidUpdate(prevProps, prevState) {
-    if (prevState !== this.state) {
-      this.props.onDataChange({
-        actions: this.state.actions,
-        hexes: this.state.hexes,
-        title: this.state.title,
-        level: this.state.level,
-        initiative: this.state.initiative,
-        summonTop: this.state.summonTop,
-        summonBottom: this.state.summonBottom,
-      })
-    }
+    const {
+      color,
+      actions,
+      hexes,
+      title,
+      level,
+      initiative,
+      summon,
+    } = this.props.data
 
-    if (prevProps.color === this.props.color) return
+    this.props.onDataChange({
+      color,
+      actions,
+      hexes,
+      title,
+      level,
+      initiative,
+      summon,
+    })
 
-    const editor = this.editor as any
-    editor.value.document.getTexts().forEach((text) => {
-      text.marks.forEach((mark) => {
-        if (mark.type !== 'card-title') return
+    this.updateTitleColor()
+  }
 
-        editor.setMarkByKey(text.key, 0, undefined, mark, {
-          type: 'card-title',
-          data: {
-            color: this.props.color,
-          },
-        })
+  updateTitleColor = () => {
+    const { color } = this.props.data
+
+    const editor = this.titleEditor
+    if (!editor) return
+
+    editor.value.document.getBlocks().forEach((block: any) => {
+      if (!block)
+        return
+      else if (block.data.get('color') === color) 
+        return
+
+      editor.setNodeByKey(block.key, {
+        type: 'card-title',
+        data: {
+          color: color,
+        },
       })
     })
   }
 
-  renderTitleMark = (props, editor, next) => {
-    if (props.mark.type === 'card-title') {
+  renderTitleBlock = (props: RenderBlockProps, editor: CoreEditor, next: () => any) => {
+    const { attributes, children, node } = props
+
+    if (node.type === 'card-title') {
       let style = {
-        backgroundImage: `linear-gradient(${props.mark.data.get('color')}80, white)`,
+        backgroundImage: `linear-gradient(${node.data.get('color')}80, white)`,
         WebkitBackgroundClip: 'text',
         WebkitTextFillColor: 'transparent',
       }
-      return <span {...props.attributes} style={style}>{props.children}</span>
+      return <span {...attributes} style={style}>{children}</span>
     }
     return next()
   }
 
-  ref = (editor: any) => {
-    this.editor = editor
+  titleRef = (editor: Editor) => {
+    this.titleEditor = editor
   }
 
   render() {
@@ -335,33 +382,49 @@ export class Card extends React.Component<CardProps, CardState> {
         <div>
           <img alt='card' className='center' src={require('../assets/card.jpg')}/>
           <img alt='card-runes' className='center runes' src={require('../assets/card-runes.jpg')}/>
-          <div className='center color' style={{background: `${this.props.color}80`}}></div>
+          <div className='center color' style={{background: `${this.props.data.color}80`}}></div>
           <div className='actions' onDrop={this.onDrop} onDragOver={this.onDragOver} onMouseMove={this.onMouseMove} onMouseUp={this.onMouseUp}>
             <Editor
               className='title single-line'
-              readOnly={this.props.cursor !== 'text'}
-              value={this.state.title}
+              spellCheck={false}
+              readOnly={this.props.cursor !== 'edit'}
+              value={this.props.data.title}
               onChange={this.onTitleChange}
-              renderMark={this.renderTitleMark}
-              ref={this.ref}
+              renderBlock={this.renderTitleBlock}
+              ref={this.titleRef}
             />
             <Editor
               className='level single-line'
-              readOnly={this.props.cursor !== 'text'}
-              value={this.state.level}
+              spellCheck={false}
+              readOnly={this.props.cursor !== 'edit'}
+              value={this.props.data.level}
               onChange={this.onLevelChange}
             />
             <Editor
               className='initiative single-line'
-              readOnly={this.props.cursor !== 'text'}
-              value={this.state.initiative}
+              spellCheck={false}
+              readOnly={this.props.cursor !== 'edit'}
+              value={this.props.data.initiative}
               onChange={this.onInitiativeChange}
             />
 
-            {this.state.summonTop && <Summon className='summon-top center runes'/>}
-            {this.state.summonBottom && <Summon className='summon-bottom center runes'/>}
+            {Object.entries(this.props.data.summon).map(([key, value]) => {
+              return <Summon
+                key={key}
+                className={classNames({
+                  'center': true,
+                  'runes': true,
+                  'summon': true,
+                  [key]: true,
+                })}
+                onSummonChange={(data) =>
+                  this.onSummonChange(key, data)
+                }
+                data={value}
+              />
+            })}
 
-            {Object.entries(this.state.actions).map(([key, value]) => {
+            {Object.entries(this.props.data.actions).map(([key, value]) => {
               return <ActionEditor
                 key={key}
                 cursor={this.props.cursor}
@@ -371,10 +434,13 @@ export class Card extends React.Component<CardProps, CardState> {
                 onDragAction={(x: number, y: number) => {
                   this.onDragAction(key, x, y)
                 }}
-                {...value}
+                onActionChange={(data) => {
+                  this.onActionChange(key, data)
+                }}
+                data={value}
               />
             })}
-            {Object.entries(this.state.hexes).map(([key, value]) => {
+            {Object.entries(this.props.data.hexes).map(([key, value]) => {
               return <HexGrid
                 key={key}
                 cursor={this.props.cursor}
@@ -384,7 +450,10 @@ export class Card extends React.Component<CardProps, CardState> {
                 onDragHex={(x: number, y: number) => {
                   this.onDragHex(key, x, y)
                 }}
-                {...value}
+                onHexChange={(data) => {
+                  this.onHexChange(key, data)
+                }}
+                data={value}
               />
             })}
           </div>
@@ -392,20 +461,22 @@ export class Card extends React.Component<CardProps, CardState> {
         <img
           src={require('../assets/summon1.png')}
           alt='summon top'
-          className="summon-toggle top"
-          style={{
-            filter: this.state.summonTop ? undefined : 'grayscale()',
-          }}
-          onClick={this.onToggleSummonTop}
+          className={classNames({
+            "summon-toggle": true,
+            "top": true,
+            "disabled": !this.props.data.summon.top.visible,
+          })}
+          onClick={this.onClickSummonTop}
         />
         <img
           src={require('../assets/summon2.png')}
           alt='summon bottom'
-          className="summon-toggle bottom"
-          style={{
-            filter: this.state.summonBottom ? undefined : 'grayscale()',
-          }}
-          onClick={this.onToggleSummonBottom}
+          className={classNames({
+            "summon-toggle": true,
+            "bottom": true,
+            "disabled": !this.props.data.summon.bottom.visible,
+          })}
+          onClick={this.onClickSummonBottom}
         />
       </div>
     )

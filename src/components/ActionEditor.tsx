@@ -1,15 +1,26 @@
 import React from 'react'
 
-import { Editor } from 'slate-react'
-import { Value } from 'slate'
+import {
+    Editor as CoreEditor,
+    Value,
+  } from 'slate'
+import {
+  Editor,
+  EditorProps,
+  RenderMarkProps,
+} from 'slate-react'
 
+import classNames from 'classnames'
+import deepEquals from 'fast-deep-equal'
+
+import { ActionData } from './Data'
 import { ActionPlugin } from './Actions'
 import { HoverMenu } from './HoverMenu'
 
 
 const PLUGINS = [
   new ActionPlugin(),
-] as any
+]
 
 const SCHEMA = {
   inlines: {
@@ -24,56 +35,36 @@ const SCHEMA = {
     },
     circle: {
       isVoid: true,
-    }
+    },
   },
 }
 
-
-export interface ActionContent {
-  value: Value
-  x: number
-  y: number
-}
-
-export interface ActionEditorProps extends ActionContent {
-  cursor: 'move' | 'text' | null
+export interface ActionEditorProps {
+  cursor: 'move' | 'edit'
   deleteAction: () => void
   onDragAction: (x: number, y: number) => void
+  onActionChange: (data: ActionData) => void
+
+  data: ActionData
 }
 
-export interface ActionEditorState extends ActionContent {}
+export interface ActionEditorState {}
 
 export class ActionEditor extends React.Component<ActionEditorProps, ActionEditorState>  {
   editor?: Editor
   containerRef = React.createRef<HTMLDivElement>()
   menuRef = React.createRef<HTMLDivElement>()
 
-  constructor(props: ActionEditorProps) {
-    super(props)
-
-    this.state = {
-      ...props,
-    }
-  }
-
-  ref = (editor: any) => {
+  ref = (editor: Editor) => {
     this.editor = editor
   }
 
-  componentDidMount = () => {
-    this.updateMenu()
-  }
-
-  componentDidUpdate = () => {
-    this.updateMenu()
-  }
-
   updateMenu = () => {
-    const containerRef: any = this.containerRef.current
-    const menu: any = this.menuRef.current
+    const containerRef = this.containerRef.current
+    const menu = this.menuRef.current
     if (!containerRef || !menu) return
 
-    const { selection } = this.state.value
+    const { selection } = this.props.data.value
     if (selection.isBlurred) {
       menu.style.top = null
       menu.style.left = null
@@ -82,12 +73,12 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
     }
 
     const rect = containerRef.getBoundingClientRect()
-    menu.style.opacity = 1
+    menu.style.opacity = '1'
     menu.style.top = `${rect.top - menu.offsetHeight}px`
     menu.style.left = `${rect.left}px`
   }
 
-  onBlur = (event: any, editor, next) => {
+  onBlur = (event: Event, editor: CoreEditor, next: () => any) => {
     const document = editor.value.document
     const text = document.text
     if (text !== '') return next()
@@ -101,34 +92,48 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
     this.props.deleteAction()
   }
 
-  onMouseDown = (e: any) => {
-    if (e.button !== 0 || this.props.cursor !== 'move') return
+  onMouseDown = (event: any) => {
+    if (event.button !== 0 || this.props.cursor !== 'move') return
 
-    e.preventDefault()
-    e.stopPropagation()
+    event.preventDefault()
+    event.stopPropagation()
 
-    this.props.onDragAction(e.clientX - this.props.x, e.clientY - this.props.y)
+    this.props.onDragAction(event.clientX - this.props.data.x, event.clientY - this.props.data.y)
   }
 
-  onChange = ({ value }) => {
-    this.setState({
-      value,
+  onChange = (change: { value: Value }) => {
+    this.props.onActionChange({
+      ...this.props.data,
+      value: change.value,
     })
   }
 
+  shouldComponentUpdate(nextProps, nextState) {
+    return !deepEquals(this.props, nextProps) || !deepEquals(this.state, nextState)
+  }
+
+  componentDidMount = () => {
+    this.updateMenu()
+  }
+
+  componentDidUpdate = () => {
+    this.updateMenu()
+
+    this.props.onActionChange(this.props.data)
+  }
+
   render() {
-    const style: any = {}
-    if (this.props.cursor === 'move') {
-      style.cursor = 'move'
-    }
+    const { cursor } = this.props
     return (
       <div
-        className='action-editor'
+        className={classNames({
+          'action-editor': true,
+          [cursor || '']: true,
+        })}
         onMouseDown={this.onMouseDown}
         style={{
-          top: this.props.y,
-          left: this.props.x,
-          ...style,
+          top: this.props.data.y,
+          left: this.props.data.x,
         }}
         ref={this.containerRef}
       >
@@ -137,9 +142,9 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
           plugins={PLUGINS}
           autoFocus
           spellCheck={false}
-          readOnly={this.props.cursor !== 'text'}
+          readOnly={this.props.cursor !== 'edit'}
           ref={this.ref}
-          value={this.state.value}
+          value={this.props.data.value}
           onChange={this.onChange}
           onBlur={this.onBlur}
           renderEditor={this.renderEditor}
@@ -149,17 +154,20 @@ export class ActionEditor extends React.Component<ActionEditorProps, ActionEdito
     )
   }
 
-  renderEditor = (props, editor, next) => {
+  renderEditor = (props: EditorProps, editor: CoreEditor, next: () => any) => {
     const children = next()
     return (
       <React.Fragment>
         {children}
-        <HoverMenu ref={this.menuRef as any} editor={editor as any} />
+        <HoverMenu
+          ref={this.menuRef as any}
+          editor={editor}
+        />
       </React.Fragment>
     )
   }
 
-  renderMark = (props: any, editor: any, next: () => any) => {
+  renderMark = (props: RenderMarkProps, editor: CoreEditor, next: () => any) => {
     const { children, mark, attributes } = props
 
     switch (mark.type) {

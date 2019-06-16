@@ -58,19 +58,23 @@ img {
   mix-blend-mode: color;
 }
 
-#card-container .summon-toggle {
+.summon-toggle {
   position: absolute;
   left: -78px;
   height: 68px;
   width: auto;
 }
 
-#card-container .summon-toggle.top {
+.summon-toggle.top {
   top: 97px;
 }
 
-#card-container .summon-toggle.bottom {
+.summon-toggle.bottom {
   top: 337px;
+}
+
+.summon-toggle.disabled {
+  filter: grayscale();
 }
 
 .actions {
@@ -110,15 +114,15 @@ img {
   font-size: 34pt;
 }
 
-.actions .summon-top {
+.actions .summon.top {
   top: 85px;
 }
 
-.actions .summon-bottom {
+.actions .summon.bottom {
   top: 325px;
 }
 
-.actions .summon-top > img, .actions .summon-bottom > img {
+.actions .summon > img {
   position: relative;
   left: 45px
 }
@@ -186,10 +190,25 @@ img {
   padding: 2px;
   width: fit-content;
 }
+.action-editor.move {
+  cursor: move;
+}
 
 .action-main {
   font-family: Nyala;
   padding: 0 2px;
+}
+
+.action-main.left {
+  justify-content: flex-start,
+}
+
+.action-main.right {
+  justify-content: flex-end,
+}
+
+.action-main.center {
+  justify-content: center,
 }
 
 .action {
@@ -307,6 +326,14 @@ img {
   align-items: center;
 }
 
+.toolbar.main {
+  min-width: fit-content;
+}
+
+.toolbar .click {
+  cursor: pointer;
+}
+
 .toolbar > div {
   min-width: 30px;
   min-height: 30px;
@@ -348,8 +375,58 @@ img {
 }
 
 .hover-menu .consume {
+  font-size: 16px;
   height: 1em;
   width: auto;
+}
+
+.hover-menu .xp-value {
+  color: white;
+  padding: 0 4px;
+  text-align: center;
+  min-width: 2ems;
+}
+
+.hover-menu .icon {
+  display: flex;
+  font-size: 18px;
+  vertical-align: text-bottom;
+}
+
+.hover-menu .button {
+  cursor: pointer;
+  color: #ccc;
+}
+
+.hover-menu .button.active {
+  color: black;
+}
+
+.hover-menu .button.reversed {
+  color: #aaa;
+}
+
+.hover-menu .button.active.reversed {
+  color: white;
+}
+
+.hover-menu .font-size {
+  color: white;
+  padding: 0 4px;
+  text-align: center;
+  min-width: 2ems;
+}
+
+.hexgrid {
+  position: absolute;
+}
+
+.hexgrid.move {
+  cursor: move;
+}
+
+.hexgrid.edit {
+  cursor: pointer;
 }
 
 [data-slate-object=text] {

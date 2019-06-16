@@ -1,37 +1,26 @@
 import React from 'react'
 
+import classNames from 'classnames'
+import deepEquals from 'fast-deep-equal'
 
-export interface Hex {
-  row: number
-  column: number
-  type: 'add' | 'enemy' | 'player' | 'enhancement'
-}
+import { Hex, HexData } from './Data'
+
 
 export interface HexProps {
-  cursor: 'move' | 'text' | null
+  cursor: 'move' | 'edit'
   deleteHex: () => void
   onDragHex: (x: number, y: number) => void
+  onHexChange: (data: HexData) => void
 
-  hexes: Hex[]
-  height: number
-  width: number
-  x: number
-  y: number
-  orientation: 'vertical' | 'horizontal'
+  data: HexData
 }
 
 export interface HexState {
-  hexes: Hex[]
   cachedHexes?: Hex[]
-  height: number
-  width: number
-  x: number
-  y: number
-  orientation: 'vertical' | 'horizontal'
 }
 
 export class HexGrid extends React.Component<HexProps, HexState> {
-  types = {
+  static types = {
     'add': 0,
     'enemy': 1,
     'player': 2,
@@ -42,17 +31,11 @@ export class HexGrid extends React.Component<HexProps, HexState> {
     super(props)
 
     this.state = {
-      hexes: props.hexes,
-      cachedHexes: this.getCachedHexes(props.hexes),
-      height: props.height,
-      width: props.width,
-      x: props.x,
-      y: props.y,
-      orientation: props.orientation,
+      cachedHexes: HexGrid.getCachedHexes(props.data.hexes),
     }
   }
 
-  getCachedHexes = (hexes: Hex[]) => {
+  static getCachedHexes = (hexes: Hex[]) => {
     let cachedHexes = hexes.flatMap((hex) => {
       const columnOffset = Math.abs(hex.row % 2) === 1 ? 0 : -1
       return [
@@ -99,7 +82,7 @@ export class HexGrid extends React.Component<HexProps, HexState> {
           otherHex.column === hex.column &&
           otherHex.row === hex.row &&
           (
-            this.types[hex.type] < this.types[otherHex.type] ||
+            HexGrid.types[hex.type] < HexGrid.types[otherHex.type] ||
             (hex.type === otherHex.type && index > otherIndex)
           )
       })
@@ -116,6 +99,15 @@ export class HexGrid extends React.Component<HexProps, HexState> {
     }
 
     return cachedHexes
+  }
+
+  static getDerivedStateFromProps(props, state) {
+    if (props.data.hexes) {
+      return {
+        cachedHexes: HexGrid.getCachedHexes(props.data.hexes),
+      }
+    }
+    return null
   }
 
   onClick = (e: any, hex: Hex) => {
@@ -135,7 +127,7 @@ export class HexGrid extends React.Component<HexProps, HexState> {
       newType = null
     }
 
-    const hexes = this.state.hexes.filter(otherHex => {
+    const hexes = this.props.data.hexes.filter(otherHex => {
       return otherHex.column !== hex.column || otherHex.row !== hex.row
     })
     if (newType) {
@@ -145,9 +137,9 @@ export class HexGrid extends React.Component<HexProps, HexState> {
       })
     }
 
-    this.setState({
+    this.props.onHexChange({
+      ...this.props.data,
       hexes,
-      cachedHexes: this.getCachedHexes(hexes),
     })
   }
 
@@ -157,29 +149,32 @@ export class HexGrid extends React.Component<HexProps, HexState> {
     e.preventDefault()
     e.stopPropagation()
 
-    this.props.onDragHex(e.clientX - this.props.x, e.clientY - this.props.y)
+    this.props.onDragHex(e.clientX - this.props.data.x, e.clientY - this.props.data.y)
+  }
+
+  shouldComponentUpdate(nextProps, nextState) {
+    return !deepEquals(this.props, nextProps) || !deepEquals(this.state, nextState)
   }
 
   render() {
-    const { cursor, x, y } = this.props
-    const { cachedHexes, height, width, orientation } = this.state
-    const style: any = {}
-    if (cursor === 'move') {
-      style.cursor = 'move'
-    }
+    const { cursor, data } = this.props
+    const { height, width, orientation, x, y } = data
+    const { cachedHexes } = this.state
 
     return (
       <div
+        className={classNames({
+          "hexgrid": true,
+          [this.props.cursor || '']: true,
+        })}
         style={{
-          position: 'absolute',
           top: y,
           left: x,
-          ...style,
         }}
         onMouseDown={this.onMouseDown}
       >
         {cachedHexes && cachedHexes.filter(hex => {
-          return (cursor === 'text') || hex.type !== 'add'
+          return (cursor === 'edit') || hex.type !== 'add'
         }).map((hex, index) => {
           const columnOffset = Math.abs(hex.row % 2) === 1 ? width / 2 : 0
           const rowPos = `${(hex.row * height * 3 / 4)}px`
@@ -205,7 +200,6 @@ export class HexGrid extends React.Component<HexProps, HexState> {
               width: `${width}px`,
               height: `${height}px`,
               position: 'absolute',
-              zIndex: this.types[hex.type],
               top: top,
               left: left,
               transform: transform,
