@@ -13,7 +13,7 @@ export interface SummonData {
 
 export interface SummonJSON {
   visible: boolean
-  name: ValueJSON
+  name: string
   box1: ValueJSON
   box2: ValueJSON
   box3: ValueJSON
@@ -46,9 +46,9 @@ export interface CardJSON {
   hexes: {
     [key: string]: HexData,
   }
-  title: ValueJSON
-  level: ValueJSON
-  initiative: ValueJSON
+  title: string
+  level: string
+  initiative: string
   summon: {
     top: SummonJSON,
     bottom: SummonJSON,
