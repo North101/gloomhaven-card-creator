@@ -31,7 +31,7 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
     this.onThrottledColorChange(value)
   }
 
-  onThrottledColorChange = throttle(500, (color: string) => {
+  onThrottledColorChange = throttle(100, (color: string) => {
     this.props.onColorChange(color)
   })
 

@@ -309,6 +309,9 @@ img {
   margin: 0.25% 4px;
   align-self: stretch;
 }
+.divider:last-child {
+  display: none;
+}
 
 .app {
   height: 100%;
