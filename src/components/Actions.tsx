@@ -24,7 +24,7 @@ export const Action: React.FC<ActionProps> = (props) => {
   const { data } = node
 
   return (
-    <div className='action'>
+    <div className={`action icon-${data.get('icon')}`}>
       <span>{data.get('iconOnly') ? '' : data.get('text')}</span>
       {children ? children : <span></span>}
       <img alt={data.get('text')} src={require(`../assets/${data.get('icon')}.png`)}/>
@@ -160,6 +160,8 @@ export class ActionPlugin implements Plugin {
         object: 'inline',
         ...data,
       })
+    } else {
+      return next()
     }
   }
 }

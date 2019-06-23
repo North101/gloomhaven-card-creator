@@ -56,12 +56,10 @@ const FontSizeButton = ({ editor, type }) => {
   const block = value.anchorBlock && value.anchorBlock.toJSON()
   if (!block) return null
 
-  const isActive = block && block.type === 'action-main'
-
   return (
     <Button
       reversed
-      active={isActive}
+      active
       onMouseDown={event => {
         event.preventDefault()
 
@@ -209,6 +207,7 @@ const XPButton = ({ editor, type }) => {
   return (
     <Button
       reversed
+      active
       onMouseDown={event => {
         event.preventDefault()
 
@@ -270,20 +269,24 @@ export const HoverMenu = React.forwardRef<React.Ref<HTMLDivElement>, HoverMenuPr
 
   return ReactDOM.createPortal(
     <Menu ref={ref} className='hover-menu'>
-      <FontSizeButton editor={props.editor} type='remove' />
-      <FontSizeValueButton editor={props.editor} />
-      <FontSizeButton editor={props.editor} type='add' />
-      <AlignButton editor={props.editor} align='left' />
-      <AlignButton editor={props.editor} align='center' />
-      <AlignButton editor={props.editor} align='right' />
+      <div>
+        <FontSizeButton editor={props.editor} type='remove' />
+        <FontSizeValueButton editor={props.editor} />
+        <FontSizeButton editor={props.editor} type='add' />
+        <AlignButton editor={props.editor} align='left' />
+        <AlignButton editor={props.editor} align='center' />
+        <AlignButton editor={props.editor} align='right' />
 
-      <IconOnlyButton editor={props.editor} />
-      <ConsumeButton editor={props.editor} />
+        <span className="divider"/>
 
-      <XPButton editor={props.editor} type='remove' />
-      <XPValueButton editor={props.editor} />
-      <XPButton editor={props.editor} type='add' />
-      <XPSizeButton editor={props.editor}/>
+        <IconOnlyButton editor={props.editor} />
+        <ConsumeButton editor={props.editor} />
+
+        <XPButton editor={props.editor} type='remove' />
+        <XPValueButton editor={props.editor} />
+        <XPButton editor={props.editor} type='add' />
+        <XPSizeButton editor={props.editor}/>
+      </div>
     </Menu>,
     root
   )

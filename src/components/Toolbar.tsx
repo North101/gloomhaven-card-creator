@@ -76,6 +76,9 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
           <div className='material-icons md-light click' onClick={this.onPrintClick}>print</div>
           <div className='material-icons md-light click' onClick={this.onMoveClick}>zoom_out_map</div>
         </div>
+
+        <span className="divider"/>
+        
         <div className='toolbar'>
           <div className='material-icons md-light' draggable onDragStart={this.onDragStart} onClick={this.onTextClick}>edit</div>
 
@@ -139,6 +142,9 @@ export class Toolbar extends React.Component<ToolbarProps, ToolbarState> {
 
           <ToolbarIcon type='action' icon='enhancement' text='Enhancement' iconOnly={true} />
         </div>
+
+        <span className="divider"/>
+
         <div className='toolbar main'>
           <div className='material-icons md-light click' onClick={this.onDeleteClick}>delete</div>
         </div>

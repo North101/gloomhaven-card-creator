@@ -224,6 +224,14 @@ img {
   padding: 0 2px;
 }
 
+.action.icon-persistent img,
+.action.icon-round img,
+.action.icon-card-lost img,
+.action.icon-card-recover img,
+.action.icon-card-unrecoverable img {
+  height: 2.0em;
+}
+
 .action > div {
   display: inline-block;
   text-align: center;
@@ -243,11 +251,6 @@ img {
   position: absolute;
   top: 0;
   left: 0;
-}
-
-.action.big-icon img {
-  height: 2.0em;
-  width: auto;
 }
 
 .action.xp {
@@ -290,12 +293,21 @@ img {
 }
 
 .action.circle img {
-  height: 3.5em;
+  height: 3.0em;
   width: auto;
 }
 
 [draggable=true] {
   cursor: move;
+}
+.divider {
+  position: relative;
+  min-width: 1px;
+  max-width: 1px;
+  background-color: white;
+  display: inline-block;
+  margin: 0.25% 4px;
+  align-self: stretch;
 }
 
 .app {
@@ -370,6 +382,10 @@ img {
   background-color: #222;
   border-radius: 4px;
   transition: opacity 0.75s;
+}
+
+.hover-menu > div {
+  position: relative;
   display: flex;
   align-items: center;
 }
