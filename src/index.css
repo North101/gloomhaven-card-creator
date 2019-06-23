@@ -96,7 +96,7 @@ img {
 .actions > .title {
   top: 20px;
   font-family: PirataOne;
-  font-size: 24pt;
+  font-size: 22pt;
 }
 
 .actions > .level {
@@ -200,15 +200,15 @@ img {
 }
 
 .action-main.left {
-  justify-content: flex-start,
+  justify-content: flex-start;
 }
 
 .action-main.right {
-  justify-content: flex-end,
+  justify-content: flex-end;
 }
 
 .action-main.center {
-  justify-content: center,
+  justify-content: center;
 }
 
 .action {

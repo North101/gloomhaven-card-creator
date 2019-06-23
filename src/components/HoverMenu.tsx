@@ -41,7 +41,8 @@ export const Menu = React.forwardRef<React.Ref<any>, any>((props, ref) => (
 
 const FontSizeValueButton = ({ editor }) => {
   const { value } = editor
-  const block = value.anchorBlock && (value.anchorBlock.toJSON() || {})
+  const block = value.anchorBlock && value.anchorBlock.toJSON()
+  if (!block) return null
 
   return (
     <span className="font-size">
@@ -52,7 +53,9 @@ const FontSizeValueButton = ({ editor }) => {
 
 const FontSizeButton = ({ editor, type }) => {
   const { value } = editor
-  const block = value.anchorBlock && (value.anchorBlock.toJSON() || {})
+  const block = value.anchorBlock && value.anchorBlock.toJSON()
+  if (!block) return null
+
   const isActive = block && block.type === 'action-main'
 
   return (
@@ -78,8 +81,10 @@ const FontSizeButton = ({ editor, type }) => {
 
 const AlignButton = ({ editor, align }) => {
   const { value } = editor
-  const block = value.anchorBlock && (value.anchorBlock.toJSON() || {})
-  const isActive = block && block.type === 'action-main' && (block.data.align || 'center') === align
+  const block = value.anchorBlock && value.anchorBlock.toJSON()
+  if (!block) return null
+
+  const isActive = block.type === 'action-main' && (block.data.align || 'center') === align
 
   return (
     <Button
@@ -93,7 +98,7 @@ const AlignButton = ({ editor, align }) => {
           data: {
             ...block.data,
             align: align,
-          }
+          },
         })
       }}
     >
@@ -200,12 +205,10 @@ const XPButton = ({ editor, type }) => {
   if (!Inline.isInline(node) || !['xp', 'circle'].includes(node.type)) return null
 
   const inline = (node.toJSON() || {}) as any
-  const isActive = !inline.data.consume
 
   return (
     <Button
       reversed
-      active={isActive}
       onMouseDown={event => {
         event.preventDefault()
 
@@ -219,6 +222,40 @@ const XPButton = ({ editor, type }) => {
       }}
     >
       <Icon>{`${type}_circle`}</Icon>
+    </Button>
+  )
+}
+
+const XPSizeButton = ({ editor }) => {
+  const { value } = editor
+
+  const { document, selection } = value
+  const { focus } = selection
+  if (!selection.isCollapsed) return null
+
+  const node = focus.path && document.getParent(focus.path)
+  if (!Inline.isInline(node) || !['xp'].includes(node.type)) return null
+
+  const inline = (node.toJSON() || {}) as any
+  const isActive = inline.data.size !== 'small'
+
+  return (
+    <Button
+      reversed
+      active={isActive}
+      onMouseDown={event => {
+        event.preventDefault()
+
+        editor.setInlines({
+          ...inline,
+          data: {
+            ...inline.data,
+            size: isActive ? 'small' : 'big',
+          }
+        })
+      }}
+    >
+      <Icon>format_size</Icon>
     </Button>
   )
 }
@@ -246,6 +283,7 @@ export const HoverMenu = React.forwardRef<React.Ref<HTMLDivElement>, HoverMenuPr
       <XPButton editor={props.editor} type='remove' />
       <XPValueButton editor={props.editor} />
       <XPButton editor={props.editor} type='add' />
+      <XPSizeButton editor={props.editor}/>
     </Menu>,
     root
   )

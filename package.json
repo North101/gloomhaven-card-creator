@@ -5,8 +5,8 @@
   "homdpage": "https://north101.github.io",
   "dependencies": {
     "@bitjourney/uuid-v4": "^1.0.1",
-    "@types/node": "12.0.8",
-    "@types/react": "16.8.20",
+    "@types/node": "12.0.10",
+    "@types/react": "16.8.22",
     "@types/react-dom": "16.8.4",
     "@types/slate-react": "^0.22.1",
     "classnames": "^2.2.6",
