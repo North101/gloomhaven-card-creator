@@ -147,7 +147,7 @@ export class ActionPlugin implements Plugin {
     event.stopPropagation()
 
     const { dataTransfer } = event
-    if (!dataTransfer) return
+    if (!dataTransfer) return next()
 
     const type = dataTransfer.getData('type')
     if (!type) return next()
@@ -160,8 +160,6 @@ export class ActionPlugin implements Plugin {
         object: 'inline',
         ...data,
       })
-    } else {
-      return next()
     }
   }
 }
